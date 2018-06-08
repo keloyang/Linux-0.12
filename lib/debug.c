@@ -1,12 +1,12 @@
-// Linux0.12 æ‰“å°ä¿¡æ¯ç›¸å…³
+// Linux0.12 ´òÓ¡ĞÅÏ¢Ïà¹Ø
 #include <stdarg.h>
 
 #include <linux/kernel.h>
 
-// å‡½æ•°vsprintf()å®šä¹‰åœ¨linux/kernel/vsprintf.cä¸­
+// º¯Êıvsprintf()¶¨ÒåÔÚlinux/kernel/vsprintf.cÖĞ
 extern int vsprintf(char * buf, const char * fmt, va_list args);
 
-static char log_buf[1024];                       // æ˜¾ç¤ºç”¨ä¸´æ—¶ç¼“å†²åŒºã€‚
+static char log_buf[1024];                       // ÏÔÊ¾ÓÃÁÙÊ±»º³åÇø¡£
 
 static unsigned short cur_log_level = LOG_INFO_TYPE;
 
@@ -14,13 +14,14 @@ static unsigned short cur_log_level = LOG_INFO_TYPE;
 void Log(unsigned short log_level, const char *fmt, ...)
 {
     if (log_level >= cur_log_level) {
-        va_list args;                           // va_listå®é™…ä¸Šæ˜¯ä¸€ä¸ªå­—ç¬¦æŒ‡é’ˆç±»å‹.
+        va_list args;                           // va_listÊµ¼ÊÉÏÊÇÒ»¸ö×Ö·ûÖ¸ÕëÀàĞÍ.
 
-        // è¿è¡Œå‚æ•°å¤„ç†å¼€å§‹å‡½æ•°.ç„¶åä½¿ç”¨æ ¼å¼ä¸²fmtå°†å‚æ•°åˆ—è¡¨argsè¾“å‡ºåˆ°bufä¸­.è¿”å›å€¼iç­‰äºè¾“å‡ºå­—ç¬¦ä¸²çš„é•¿åº¦.å†è¿è¡Œå‚æ•°å¤„ç†ç»“æŸå‡½æ•°.æœ€åè°ƒç”¨æ§åˆ¶å°æ˜¾ç¤º
-        // å‡½æ•°å¹¶è¿”å›æ˜¾ç¤ºå­—ç¬¦æ•°.
+        // ÔËĞĞ²ÎÊı´¦Àí¿ªÊ¼º¯Êı.È»ºóÊ¹ÓÃ¸ñÊ½´®fmt½«²ÎÊıÁĞ±íargsÊä³öµ½bufÖĞ.·µ»ØÖµiµÈÓÚÊä³ö×Ö·û´®µÄ³¤¶È.ÔÙÔËĞĞ²ÎÊı´¦Àí½áÊøº¯Êı.×îºóµ÷ÓÃ¿ØÖÆÌ¨ÏÔÊ¾
+        // º¯Êı²¢·µ»ØÏÔÊ¾×Ö·ûÊı.
         va_start(args, fmt);
         vsprintf(log_buf, fmt, args);
         va_end(args);
         console_print(log_buf);                 // chr_drv/console.c
     }
 }
+

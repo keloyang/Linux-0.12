@@ -6,120 +6,121 @@
  * offsets into 'tty_queue'
  */
 /*
- * 'tty.h'ä¸­å®šä¹‰äº†tty_io.cç¨‹åºä½¿ç”¨çš„æŸäº›ç»“æ„å’Œå…¶ä»–ä¸€äº›å®šä¹‰.
+ * 'tty.h'ÖĞ¶¨ÒåÁËtty_io.c³ÌĞòÊ¹ÓÃµÄÄ³Ğ©½á¹¹ºÍÆäËûÒ»Ğ©¶¨Òå.
  *
- * æ³¨æ„!åœ¨ä¿®æ”¹è¿™é‡Œçš„å®šä¹‰æ—¶,ä¸€å®šè¦æ£€æŸ¥rs_io.sæˆ–con_io.sç¨‹åºä¸­ä¸ä¼šå‡ºç°é—®é¢˜
- * åœ¨ç³»ç»Ÿä¸­æœ‰äº›å¸¸é‡æ˜¯ç›´æ¥å†™åœ¨ç¨‹åºä¸­çš„(ä¸»è¦æ˜¯ä¸€äº›tty_queueä¸­çš„åç§»å€¼).
+ * ×¢Òâ!ÔÚĞŞ¸ÄÕâÀïµÄ¶¨ÒåÊ±,Ò»¶¨Òª¼ì²érs_io.s»òcon_io.s³ÌĞòÖĞ²»»á³öÏÖÎÊÌâ
+ * ÔÚÏµÍ³ÖĞÓĞĞ©³£Á¿ÊÇÖ±½ÓĞ´ÔÚ³ÌĞòÖĞµÄ(Ö÷ÒªÊÇÒ»Ğ©tty_queueÖĞµÄÆ«ÒÆÖµ).
  */
 
 #ifndef _TTY_H
 #define _TTY_H
 
-#define MAX_CONSOLES	8								// æœ€å¤§è™šæ‹Ÿæ§åˆ¶å°æ•°é‡.
-#define NR_SERIALS		2								// ä¸²è¡Œç»ˆç«¯æ•°é‡
-#define NR_PTYS			4								// ä¼ªç»ˆç«¯æ•°é‡
+#define MAX_CONSOLES	8								// ×î´óĞéÄâ¿ØÖÆÌ¨ÊıÁ¿.
+#define NR_SERIALS		2								// ´®ĞĞÖÕ¶ËÊıÁ¿
+#define NR_PTYS			4								// Î±ÖÕ¶ËÊıÁ¿
 
 extern int NR_CONSOLES;
 
 #include <termios.h>
 
-#define TTY_BUF_SIZE 1024								// ttyç¼“å†²åŒº(ç¼“å†²é˜Ÿåˆ—)å¤§å°.
+#define TTY_BUF_SIZE 1024								// tty»º³åÇø(»º³å¶ÓÁĞ)´óĞ¡.
 
-// ttyå­—ç¬¦ç¼“å†²é˜Ÿåˆ—æ•°æ®ç»“æ„.ç”¨äºtty_strucç»“æ„ä¸­çš„è¯»/å†™å’Œè¾…åŠ©(è§„èŒƒ)ç¼“å†²é˜Ÿåˆ—.
+// tty×Ö·û»º³å¶ÓÁĞÊı¾İ½á¹¹.ÓÃÓÚtty_struc½á¹¹ÖĞµÄ¶Á/Ğ´ºÍ¸¨Öú(¹æ·¶)»º³å¶ÓÁĞ.
 struct tty_queue {
-	unsigned long data;									// é˜Ÿåˆ—ç¼“å†²åŒºä¸­å«æœ‰å­—ç¬¦è¡Œæ•°å€¼(ä¸æ˜¯å½“å‰å­—ç¬¦æ•°).å¯¹äºä¸²å£ç»ˆç«¯,åˆ™å­˜æ”¾ä¸²è¡Œç«¯å£åœ°å€.
-	unsigned long head;									// ç¼“å†²åŒºä¸­æ•°æ®å¤´æŒ‡é’ˆ
-	unsigned long tail;									// ç¼“å†²åŒºä¸­æ•°æ®å°¾æŒ‡é’ˆ
-	struct task_struct * proc_list;						// ç­‰å¾…æœ¬é˜Ÿåˆ—çš„è¿›ç¨‹åˆ—è¡¨.
-	char buf[TTY_BUF_SIZE];								// é˜Ÿåˆ—çš„ç¼“å†²åŒº.
+	unsigned long data;									// ¶ÓÁĞ»º³åÇøÖĞº¬ÓĞ×Ö·ûĞĞÊıÖµ(²»ÊÇµ±Ç°×Ö·ûÊı).¶ÔÓÚ´®¿ÚÖÕ¶Ë,Ôò´æ·Å´®ĞĞ¶Ë¿ÚµØÖ·.
+	unsigned long head;									// »º³åÇøÖĞÊı¾İÍ·Ö¸Õë
+	unsigned long tail;									// »º³åÇøÖĞÊı¾İÎ²Ö¸Õë
+	struct task_struct * proc_list;						// µÈ´ı±¾¶ÓÁĞµÄ½ø³ÌÁĞ±í.
+	char buf[TTY_BUF_SIZE];								// ¶ÓÁĞµÄ»º³åÇø.
 };
 
-#define IS_A_CONSOLE(min)			(((min) & 0xC0) == 0x00)	// æ˜¯ä¸€ä¸ªæ§åˆ¶ç»ˆç«¯.
-#define IS_A_SERIAL(min)			(((min) & 0xC0) == 0x40)	// æ˜¯ä¸€ä¸²è¡Œç»ˆç«¯.
-#define IS_A_PTY(min)				((min) & 0x80)				// æ˜¯ä¸€ä¸ªä¼ªç»ˆç«¯.
-#define IS_A_PTY_MASTER(min)		(((min) & 0xC0) == 0x80)	// æ˜¯ä¸€ä¸ªä¸»ä¼ªç»ˆç«¯.
-#define IS_A_PTY_SLAVE(min)			(((min) & 0xC0) == 0xC0)	// æ˜¯ä¸€ä¸ªè¾…ä¼ªç»ˆç«¯.
-#define PTY_OTHER(min)				((min) ^ 0x40)				// å…¶ä»–ä¼ªç»ˆç«¯.
+#define IS_A_CONSOLE(min)			(((min) & 0xC0) == 0x00)	// ÊÇÒ»¸ö¿ØÖÆÖÕ¶Ë.
+#define IS_A_SERIAL(min)			(((min) & 0xC0) == 0x40)	// ÊÇÒ»´®ĞĞÖÕ¶Ë.
+#define IS_A_PTY(min)				((min) & 0x80)				// ÊÇÒ»¸öÎ±ÖÕ¶Ë.
+#define IS_A_PTY_MASTER(min)		(((min) & 0xC0) == 0x80)	// ÊÇÒ»¸öÖ÷Î±ÖÕ¶Ë.
+#define IS_A_PTY_SLAVE(min)			(((min) & 0xC0) == 0xC0)	// ÊÇÒ»¸ö¸¨Î±ÖÕ¶Ë.
+#define PTY_OTHER(min)				((min) ^ 0x40)				// ÆäËûÎ±ÖÕ¶Ë.
 
-// ä»¥ä¸‹å®šä¹‰äº†ttyç­‰å¾…é˜Ÿåˆ—ä¸­ç¼“å†²åŒºæ“ä½œå®å‡½æ•°.(tailåœ¨å‰,headåœ¨å)
-#define INC(a) ((a) = ((a) + 1) & (TTY_BUF_SIZE - 1))           				// aç¼“å†²åŒºæŒ‡é’ˆå‰ç§»1å­—èŠ‚,è‹¥å·²è¶…å‡ºç¼“å†²åŒºå³ä¾§,åˆ™æŒ‡é’ˆå¾ªç¯
-#define DEC(a) ((a) = ((a) - 1) & (TTY_BUF_SIZE - 1))           				// aç¼“å†²åŒºæŒ‡é’ˆåé€€1å­—èŠ‚,å¹¶å¾ªç¯
-#define EMPTY(a) ((a)->head == (a)->tail)                       				// ç¼“å†²åŒºæ˜¯å¦ä¸ºç©º
-#define LEFT(a) (((a)->tail - (a)->head - 1) & (TTY_BUF_SIZE - 1))      		// ç¼“å†²åŒºè¿˜å¯å­˜æ”¾å­—ç¬¦çš„é•¿åº¦(ç©ºé—²åŒºé•¿åº¦)
-#define LAST(a) ((a)->buf[(TTY_BUF_SIZE - 1) & ((a)->head - 1)])      			// ç¼“å†²åŒºä¸­æœ€åä¸€ä¸ªä½ç½®
-#define FULL(a) (!LEFT(a))                                      				// ç¼“å†²åŒºæ»¡(å¦‚æœä¸º1çš„è¯)
-#define CHARS(a) (((a)->head - (a)->tail) & (TTY_BUF_SIZE - 1))       			// ç¼“å†²åŒºä¸­å·²å­˜æ”¾å­—ç¬¦çš„é•¿åº¦(å­—ç¬¦æ•°)
-// ä»queueé˜Ÿåˆ—é¡¹ç¼“å†²åŒºä¸­å–ä¸€å­—ç¬¦(ä»tailå¤„,å¹¶ä¸”tail+=1)
+// ÒÔÏÂ¶¨ÒåÁËttyµÈ´ı¶ÓÁĞÖĞ»º³åÇø²Ù×÷ºêº¯Êı.(tailÔÚÇ°,headÔÚºó)
+#define INC(a) ((a) = ((a) + 1) & (TTY_BUF_SIZE - 1))           				// a»º³åÇøÖ¸ÕëÇ°ÒÆ1×Ö½Ú,ÈôÒÑ³¬³ö»º³åÇøÓÒ²à,ÔòÖ¸ÕëÑ­»·
+#define DEC(a) ((a) = ((a) - 1) & (TTY_BUF_SIZE - 1))           				// a»º³åÇøÖ¸ÕëºóÍË1×Ö½Ú,²¢Ñ­»·
+#define EMPTY(a) ((a)->head == (a)->tail)                       				// »º³åÇøÊÇ·ñÎª¿Õ
+#define LEFT(a) (((a)->tail - (a)->head - 1) & (TTY_BUF_SIZE - 1))      		// »º³åÇø»¹¿É´æ·Å×Ö·ûµÄ³¤¶È(¿ÕÏĞÇø³¤¶È)
+#define LAST(a) ((a)->buf[(TTY_BUF_SIZE - 1) & ((a)->head - 1)])      			// »º³åÇøÖĞ×îºóÒ»¸öÎ»ÖÃ
+#define FULL(a) (!LEFT(a))                                      				// »º³åÇøÂú(Èç¹ûÎª1µÄ»°)
+#define CHARS(a) (((a)->head - (a)->tail) & (TTY_BUF_SIZE - 1))       			// »º³åÇøÖĞÒÑ´æ·Å×Ö·ûµÄ³¤¶È(×Ö·ûÊı)
+// ´Óqueue¶ÓÁĞÏî»º³åÇøÖĞÈ¡Ò»×Ö·û(´Ótail´¦,²¢ÇÒtail+=1)
 #define GETCH(queue, c) \
 (void)({c = (queue)->buf[(queue)->tail]; INC((queue)->tail);})
-// å¾€queueé˜Ÿåˆ—é¡¹ç¼“å†²åŒºä¸­æ”¾ç½®ä¸€å­—ç¬¦(åœ¨headå¤„,å¹¶ä¸”head+=1)
+// Íùqueue¶ÓÁĞÏî»º³åÇøÖĞ·ÅÖÃÒ»×Ö·û(ÔÚhead´¦,²¢ÇÒhead+=1)
 #define PUTCH(c, queue) \
 (void)({(queue)->buf[(queue)->head] = (c); INC((queue)->head);})
 
-// åˆ¤æ–­ç»ˆç«¯é”®ç›˜å­—ç¬¦ç±»å‹
-#define INTR_CHAR(tty) ((tty)->termios.c_cc[VINTR])             			// ä¸­æ–­ç¬¦.å‘ä¸­æ–­ä¿¡å·SIGINT
-#define QUIT_CHAR(tty) ((tty)->termios.c_cc[VQUIT])     					// é€€å‡ºç¬¦.å‘é€€å‡ºä¿¡å·SIGQUIT
-#define ERASE_CHAR(tty) ((tty)->termios.c_cc[VERASE])   					// åˆ é™¤ç¬¦.æ“¦é™¤ä¸€ä¸ªå­—ç¬¦
-#define KILL_CHAR(tty) ((tty)->termios.c_cc[VKILL])             			// åˆ é™¤è¡Œ.åˆ é™¤ä¸€è¡Œå­—ç¬¦
-#define EOF_CHAR(tty) ((tty)->termios.c_cc[VEOF])       					// æ–‡ä»¶ç»“æŸç¬¦
-#define START_CHAR(tty) ((tty)->termios.c_cc[VSTART])   					// å¼€å§‹ç¬¦.æ¢å¤è¾“å‡º
-#define STOP_CHAR(tty) ((tty)->termios.c_cc[VSTOP])     					// åœæ­¢ç¬¦.åœæ­¢è¾“å‡º
-#define SUSPEND_CHAR(tty) ((tty)->termios.c_cc[VSUSP])  					// æŒ‚èµ·ç¬¦.å‘æŒ‚èµ·ä¿¡å·SIGTSTP
+// ÅĞ¶ÏÖÕ¶Ë¼üÅÌ×Ö·ûÀàĞÍ
+#define INTR_CHAR(tty) ((tty)->termios.c_cc[VINTR])             			// ÖĞ¶Ï·û.·¢ÖĞ¶ÏĞÅºÅSIGINT
+#define QUIT_CHAR(tty) ((tty)->termios.c_cc[VQUIT])     					// ÍË³ö·û.·¢ÍË³öĞÅºÅSIGQUIT
+#define ERASE_CHAR(tty) ((tty)->termios.c_cc[VERASE])   					// É¾³ı·û.²Á³ıÒ»¸ö×Ö·û
+#define KILL_CHAR(tty) ((tty)->termios.c_cc[VKILL])             			// É¾³ıĞĞ.É¾³ıÒ»ĞĞ×Ö·û
+#define EOF_CHAR(tty) ((tty)->termios.c_cc[VEOF])       					// ÎÄ¼ş½áÊø·û
+#define START_CHAR(tty) ((tty)->termios.c_cc[VSTART])   					// ¿ªÊ¼·û.»Ö¸´Êä³ö
+#define STOP_CHAR(tty) ((tty)->termios.c_cc[VSTOP])     					// Í£Ö¹·û.Í£Ö¹Êä³ö
+#define SUSPEND_CHAR(tty) ((tty)->termios.c_cc[VSUSP])  					// ¹ÒÆğ·û.·¢¹ÒÆğĞÅºÅSIGTSTP
 
-// ttyæ•°æ®ç»“æ„
+// ttyÊı¾İ½á¹¹
 struct tty_struct {
-	struct termios termios;						// ç»ˆç«¯ioå±æ€§å’Œæ§åˆ¶å­—ç¬¦æ•°æ®ç»“æ„.
-	int pgrp;									// æ‰€å±è¿›ç¨‹ç»„.
-	int session;								// ä¼šè¯å·.
-	int stopped;								// åœæ­¢æ ‡å¿—.
-	void (*write)(struct tty_struct * tty);		// ttyå†™å‡½æ•°æŒ‡é’ˆ.
-	struct tty_queue *read_q;					// ttyè¯»é˜Ÿåˆ—.
-	struct tty_queue *write_q;					// ttyå†™é˜Ÿåˆ—.
-	struct tty_queue *secondary;				// ttyè¾…åŠ©é˜Ÿåˆ—(å­˜æ”¾è§„èŒƒæ¨¡å¼å­—ç¬¦åºåˆ—).å¯ç§°ä¸ºè§„èŒƒ(ç†Ÿ)æ¨¡å¼é˜Ÿåˆ—.
+	struct termios termios;						// ÖÕ¶ËioÊôĞÔºÍ¿ØÖÆ×Ö·ûÊı¾İ½á¹¹.
+	int pgrp;									// ËùÊô½ø³Ì×é.
+	int session;								// »á»°ºÅ.
+	int stopped;								// Í£Ö¹±êÖ¾.
+	void (*write)(struct tty_struct * tty);		// ttyĞ´º¯ÊıÖ¸Õë.
+	struct tty_queue *read_q;					// tty¶Á¶ÓÁĞ.
+	struct tty_queue *write_q;					// ttyĞ´¶ÓÁĞ.
+	struct tty_queue *secondary;				// tty¸¨Öú¶ÓÁĞ(´æ·Å¹æ·¶Ä£Ê½×Ö·ûĞòÁĞ).¿É³ÆÎª¹æ·¶(Êì)Ä£Ê½¶ÓÁĞ.
 	};
 
-extern struct tty_struct tty_table[];			// ttyç»“æ„æ•°ç»„.
-extern int fg_console;							// å‰å°æ§åˆ¶å°å·
+extern struct tty_struct tty_table[];			// tty½á¹¹Êı×é.
+extern int fg_console;							// Ç°Ì¨¿ØÖÆÌ¨ºÅ
 
-// æ ¹æ®ç»ˆç«¯ç±»å‹åœ¨tty_table[]ä¸­å–å¯¹åº”ç»ˆç«¯å·nrçš„ttyç»“æ„æŒ‡é’ˆ.ç¬¬73è¡ŒååŠéƒ¨åˆ†ç”¨äºæ ¹æ®å­è®¾å¤‡å·devåœ¨tty_table[]è¡¨ä¸­é€‰æ‹©å¯¹åº”çš„ttyç»“æ„.
-// å¦‚æœdev = 0,è¡¨ç¤ºæ­£åœ¨ä½¿ç”¨å‰å°ç»ˆç«¯,å› æ­¤ç›´æ¥ä½¿ç”¨ç»ˆç«¯å·fg_consoleä½œä¸ºtty_table[]é¡¹ç´¢å¼•å–ttyç»“æ„.å¦‚æœdevå¤§äº0,é‚£ä¹ˆå°±è¦åˆ†ä¸¤ç§æƒ…å†µ
-// è€ƒè™‘:1,devæ˜¯è™šæ‹Ÿç»ˆç«¯å·;2,devæ˜¯ä¸²è¡Œç»ˆç«¯å·æˆ–è€…ä¼ªç»ˆç«¯å·.å¯¹äºè™šæ‹Ÿç»ˆç«¯å…¶ttyç»“æ„åœ¨tty_table[] ç´¢å¼•é¡¹æ˜¯dev-1(0 -- 63).å¯¹äºå…¶ä»–ç±»å‹
-// ç»ˆç«¯,åˆ™å®ƒä»¬åœ¨ttyç»“æ„ç´¢å¼•é¡¹å°±æ˜¯dev.ä¾‹å¦‚ï¼Œå¦‚æœdev = 64ï¼Œè¡¨ç¤ºæ˜¯ä¸€ä¸ªä¸²è¡Œç»ˆç«¯ï¼Œåˆ™å…¶ttyç»“æ„å°±æ˜¯tty_table[dev]ã€‚å¦‚æœdev = 1,åˆ™å¯¹åº”
-// ç»ˆç«¯çš„ttyç»“æ„æ˜¯tty_table[0].
+// ¸ù¾İÖÕ¶ËÀàĞÍÔÚtty_table[]ÖĞÈ¡¶ÔÓ¦ÖÕ¶ËºÅnrµÄtty½á¹¹Ö¸Õë.µÚ73ĞĞºó°ë²¿·ÖÓÃÓÚ¸ù¾İ×ÓÉè±¸ºÅdevÔÚtty_table[]±íÖĞÑ¡Ôñ¶ÔÓ¦µÄtty½á¹¹.
+// Èç¹ûdev = 0,±íÊ¾ÕıÔÚÊ¹ÓÃÇ°Ì¨ÖÕ¶Ë,Òò´ËÖ±½ÓÊ¹ÓÃÖÕ¶ËºÅfg_console×÷Îªtty_table[]ÏîË÷ÒıÈ¡tty½á¹¹.Èç¹ûdev´óÓÚ0,ÄÇÃ´¾ÍÒª·ÖÁ½ÖÖÇé¿ö
+// ¿¼ÂÇ:1,devÊÇĞéÄâÖÕ¶ËºÅ;2,devÊÇ´®ĞĞÖÕ¶ËºÅ»òÕßÎ±ÖÕ¶ËºÅ.¶ÔÓÚĞéÄâÖÕ¶ËÆätty½á¹¹ÔÚtty_table[] Ë÷ÒıÏîÊÇdev-1(0 -- 63).¶ÔÓÚÆäËûÀàĞÍ
+// ÖÕ¶Ë,ÔòËüÃÇÔÚtty½á¹¹Ë÷ÒıÏî¾ÍÊÇdev.ÀıÈç£¬Èç¹ûdev = 64£¬±íÊ¾ÊÇÒ»¸ö´®ĞĞÖÕ¶Ë£¬ÔòÆätty½á¹¹¾ÍÊÇtty_table[dev]¡£Èç¹ûdev = 1,Ôò¶ÔÓ¦
+// ÖÕ¶ËµÄtty½á¹¹ÊÇtty_table[0].
 #define TTY_TABLE(nr) \
 (tty_table + ((nr) ? (((nr) < 64)? (nr) - 1 : (nr))	: fg_console))
 
-// è¿™é‡Œç»™å‡ºäº†ç»ˆç«¯termiosç»“æ„ä¸­å¯æ›´æ”¹çš„ç‰¹æ®Šå­—ç¬¦æ•°ç»„c_cc[]çš„åˆå§‹å€¼.è¯¥termiosç»“æ„å®šä¹‰åœ¨include/termios.hä¸­.POSIX.1å®šä¹‰äº†11ä¸ª
-// ç‰¹æ®Šå­—ç¬¦,ä½†æ˜¯Linuxç³»ç»Ÿè¿˜å¦å¤–å®šä¹‰äº†SVR4ä½¿ç”¨çš„6ä¸ªç‰¹æ®Šå­—ç¬¦.å¦‚æœå®šä¹‰äº†_POSIX_VDISABLE(\0),é‚£ä¹ˆå½“æŸä¸€é¡¹å€¼ç­‰äº_POSIX_VDISABLE
-// çš„å€¼æ—¶,è¡¨ç¤ºç¦æ­¢ä½¿ç”¨ç›¸åº”çš„ç‰¹æ®Šå­—ç¬¦.[8è¿›åˆ¶å€¼]
+// ÕâÀï¸ø³öÁËÖÕ¶Ëtermios½á¹¹ÖĞ¿É¸ü¸ÄµÄÌØÊâ×Ö·ûÊı×éc_cc[]µÄ³õÊ¼Öµ.¸Ãtermios½á¹¹¶¨ÒåÔÚinclude/termios.hÖĞ.POSIX.1¶¨ÒåÁË11¸ö
+// ÌØÊâ×Ö·û,µ«ÊÇLinuxÏµÍ³»¹ÁíÍâ¶¨ÒåÁËSVR4Ê¹ÓÃµÄ6¸öÌØÊâ×Ö·û.Èç¹û¶¨ÒåÁË_POSIX_VDISABLE(\0),ÄÇÃ´µ±Ä³Ò»ÏîÖµµÈÓÚ_POSIX_VDISABLE
+// µÄÖµÊ±,±íÊ¾½ûÖ¹Ê¹ÓÃÏàÓ¦µÄÌØÊâ×Ö·û.[8½øÖÆÖµ]
 /*	intr=^C		quit=^|		erase=del	kill=^U
 	eof=^D		vtime=\0	vmin=\1		sxtc=\0
 	start=^Q	stop=^S		susp=^Z		eol=\0
 	reprint=^R	discard=^U	werase=^W	lnext=^V
 	eol2=\0
 */
-/*	ä¸­æ–­intr=^C	é€€å‡ºquit=^|	åˆ é™¤erase=del	ç»ˆæ­¢kill=^U
-	æ–‡ä»¶ç»“æŸeof=^D	vtime=\0	vmin=\1		sxtc=\0
-	å¼€å§‹start=^Q	åœæ­¢stop=^S	æŒ‚èµ·susp=^Z	è¡Œç»“æŸeol=\0
-	é‡æ˜¾reprint=^R	ä¸¢å¼ƒdiscard=^U	werase=^W	lnext=^V
-	è¡Œç»“æŸeol2=\0
+/*	ÖĞ¶Ïintr=^C	ÍË³öquit=^|	É¾³ıerase=del	ÖÕÖ¹kill=^U
+	ÎÄ¼ş½áÊøeof=^D	vtime=\0	vmin=\1		sxtc=\0
+	¿ªÊ¼start=^Q	Í£Ö¹stop=^S	¹ÒÆğsusp=^Z	ĞĞ½áÊøeol=\0
+	ÖØÏÔreprint=^R	¶ªÆúdiscard=^U	werase=^W	lnext=^V
+	ĞĞ½áÊøeol2=\0
 */
 #define INIT_C_CC "\003\034\177\025\004\0\1\0\021\023\032\0\022\017\027\026\0"
 
-void rs_init(void);     // å¼‚æ­¥ä¸²è¡Œé€šä¿¡åˆå§‹åŒ–ã€‚ï¼ˆkernel/chr_drv/serial.cï¼‰
-void con_init(void);	// æ§åˆ¶ç»ˆç«¯åˆå§‹åŒ–.(kernel/chr_drv/console.c)
-void tty_init(void);	// ttyåˆå§‹åŒ–.(kernel/chr_drv/tty_io.c)
+void rs_init(void);     // Òì²½´®ĞĞÍ¨ĞÅ³õÊ¼»¯¡££¨kernel/chr_drv/serial.c£©
+void con_init(void);	// ¿ØÖÆÖÕ¶Ë³õÊ¼»¯.(kernel/chr_drv/console.c)
+void tty_init(void);	// tty³õÊ¼»¯.(kernel/chr_drv/tty_io.c)
 
-int tty_read(unsigned c, char * buf, int n);    // ï¼ˆkernel/chr_drv/tty_io.cï¼‰
-int tty_write(unsigned c, char * buf, int n);   // ï¼ˆkernel/chr_drv/tty_io.cï¼‰
+int tty_read(unsigned c, char * buf, int n);    // £¨kernel/chr_drv/tty_io.c£©
+int tty_write(unsigned c, char * buf, int n);   // £¨kernel/chr_drv/tty_io.c£©
 
 void con_write(struct tty_struct * tty);	// (kernel/chr_drv/console.c)
-void rs_write(struct tty_struct * tty);         //ï¼ˆkernel/chr_drv/serial.cï¼‰
-void mpty_write(struct tty_struct * tty);       //ï¼ˆkernel/chr_drv/pty.cï¼‰
-void spty_write(struct tty_struct * tty);       //ï¼ˆkernel/chr_drv/pty.cï¼‰
+void rs_write(struct tty_struct * tty);         //£¨kernel/chr_drv/serial.c£©
+void mpty_write(struct tty_struct * tty);       //£¨kernel/chr_drv/pty.c£©
+void spty_write(struct tty_struct * tty);       //£¨kernel/chr_drv/pty.c£©
 
-void copy_to_cooked(struct tty_struct * tty);   //ï¼ˆkernel/chr_drv/tty_io.cï¼‰
+void copy_to_cooked(struct tty_struct * tty);   //£¨kernel/chr_drv/tty_io.c£©
 
 void update_screen(void);	// (kernel/chr_drv/console.c)
 
 #endif
+

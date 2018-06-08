@@ -1,40 +1,41 @@
 #ifndef _CTYPE_H
 #define _CTYPE_H
 
-#define _U	0x01	/* upper */	// è¯¥æ¯”ç‰¹ä½ç”¨äºå¤§å†™å­—ç¬¦[A-Z]
-#define _L	0x02	/* lower */	// è¯¥æ¯”ç‰¹ä½ç”¨äºå°å†™å­—ç¬¦[a-z]
-#define _D	0x04	/* digit */	// è¯¥æ¯”ç‰¹ä½ç”¨äºæ•°å­—[0-9]
-#define _C	0x08	/* cntrl */	// è¯¥æ¯”ç‰¹ä½ç”¨äºæ§åˆ¶å­—ç¬¦
-#define _P	0x10	/* punct */	// è¯¥æ¯”ç‰¹ä½ç”¨äºæ ‡ç‚¹å­—ç¬¦
-#define _S	0x20	/* white space (space/lf/tab) */	// ç©ºç™½å­—ç¬¦,å¦‚ç©ºæ ¼,\t,\nç­‰
-#define _X	0x40	/* hex digit */	// è¯¥æ¯”ç‰¹ä½ç”¨äºåå…­è¿›åˆ¶æ•°å­—
-#define _SP	0x80	/* hard space (0x20) */	// è¯¥æ¯”ç‰¹ä½ç”¨äºç©ºæ ¼å­—ç¬¦(0x20)
+#define _U	0x01	/* upper */	// ¸Ã±ÈÌØÎ»ÓÃÓÚ´óĞ´×Ö·û[A-Z]
+#define _L	0x02	/* lower */	// ¸Ã±ÈÌØÎ»ÓÃÓÚĞ¡Ğ´×Ö·û[a-z]
+#define _D	0x04	/* digit */	// ¸Ã±ÈÌØÎ»ÓÃÓÚÊı×Ö[0-9]
+#define _C	0x08	/* cntrl */	// ¸Ã±ÈÌØÎ»ÓÃÓÚ¿ØÖÆ×Ö·û
+#define _P	0x10	/* punct */	// ¸Ã±ÈÌØÎ»ÓÃÓÚ±êµã×Ö·û
+#define _S	0x20	/* white space (space/lf/tab) */	// ¿Õ°××Ö·û,Èç¿Õ¸ñ,\t,\nµÈ
+#define _X	0x40	/* hex digit */	// ¸Ã±ÈÌØÎ»ÓÃÓÚÊ®Áù½øÖÆÊı×Ö
+#define _SP	0x80	/* hard space (0x20) */	// ¸Ã±ÈÌØÎ»ÓÃÓÚ¿Õ¸ñ×Ö·û(0x20)
 
-extern unsigned char _ctype[];	// å­—ç¬¦ç‰¹æ€§æ•°ç»„(è¡¨),å®šä¹‰å„ä¸ªå­—ç¬¦å¯¹åº”ä¸Šé¢çš„å±æ€§.
-extern char _ctmp;	// ä¸€ä¸ªä¸´æ—¶å­—ç¬¦å˜é‡(åœ¨å®šä¹‰lib/ctype.cä¸­).
+extern unsigned char _ctype[];	// ×Ö·ûÌØĞÔÊı×é(±í),¶¨Òå¸÷¸ö×Ö·û¶ÔÓ¦ÉÏÃæµÄÊôĞÔ.
+extern char _ctmp;	// Ò»¸öÁÙÊ±×Ö·û±äÁ¿(ÔÚ¶¨Òålib/ctype.cÖĞ).
 
-// ä¸‹é¢æ˜¯ä¸€äº›ç¡®å®šå­—ç¬¦ç±»å‹çš„å®
-#define isalnum(c) ((_ctype+1)[c]&(_U|_L|_D))		// æ˜¯å­—ç¬¦æˆ–æ•°å­—[A-Z],[a-z]æˆ–[0-9]
-#define isalpha(c) ((_ctype+1)[c]&(_U|_L))		// æ˜¯å­—ç¬¦
-#define iscntrl(c) ((_ctype+1)[c]&(_C))			// æ˜¯æ§åˆ¶å­—ç¬¦
-#define isdigit(c) ((_ctype+1)[c]&(_D))			// æ˜¯æ•°å­—
-#define isgraph(c) ((_ctype+1)[c]&(_P|_U|_L|_D))	// æ˜¯å›¾å½¢å­—ç¬¦
-#define islower(c) ((_ctype+1)[c]&(_L))			// æ˜¯å°å†™å­—ç¬¦
-#define isprint(c) ((_ctype+1)[c]&(_P|_U|_L|_D|_SP))	// æ˜¯å¯æ‰“å°å­—ç¬¦
-#define ispunct(c) ((_ctype+1)[c]&(_P))			// æ˜¯æ ‡ç‚¹ç¬¦å·
-#define isspace(c) ((_ctype+1)[c]&(_S))			// æ˜¯ç©ºç™½å­—ç¬¦å¦‚ç©ºæ ¼,\f,\n,\r,\t,\w
-#define isupper(c) ((_ctype+1)[c]&(_U))			// æ˜¯å¤§å†™å­—ç¬¦
-#define isxdigit(c) ((_ctype+1)[c]&(_D|_X))		// æ˜¯åå…­è¿›åˆ¶æ•°å­—
+// ÏÂÃæÊÇÒ»Ğ©È·¶¨×Ö·ûÀàĞÍµÄºê
+#define isalnum(c) ((_ctype+1)[c]&(_U|_L|_D))		// ÊÇ×Ö·û»òÊı×Ö[A-Z],[a-z]»ò[0-9]
+#define isalpha(c) ((_ctype+1)[c]&(_U|_L))		// ÊÇ×Ö·û
+#define iscntrl(c) ((_ctype+1)[c]&(_C))			// ÊÇ¿ØÖÆ×Ö·û
+#define isdigit(c) ((_ctype+1)[c]&(_D))			// ÊÇÊı×Ö
+#define isgraph(c) ((_ctype+1)[c]&(_P|_U|_L|_D))	// ÊÇÍ¼ĞÎ×Ö·û
+#define islower(c) ((_ctype+1)[c]&(_L))			// ÊÇĞ¡Ğ´×Ö·û
+#define isprint(c) ((_ctype+1)[c]&(_P|_U|_L|_D|_SP))	// ÊÇ¿É´òÓ¡×Ö·û
+#define ispunct(c) ((_ctype+1)[c]&(_P))			// ÊÇ±êµã·ûºÅ
+#define isspace(c) ((_ctype+1)[c]&(_S))			// ÊÇ¿Õ°××Ö·ûÈç¿Õ¸ñ,\f,\n,\r,\t,\w
+#define isupper(c) ((_ctype+1)[c]&(_U))			// ÊÇ´óĞ´×Ö·û
+#define isxdigit(c) ((_ctype+1)[c]&(_D|_X))		// ÊÇÊ®Áù½øÖÆÊı×Ö
 
-// ä¸‹é¢ä¸¤ä¸ªå®šä¹‰ä¸­,å®å‚æ•°å‰ä½¿ç”¨äº†å‰ç¼€(unsigned),å› æ­¤cåº”è¯¥åŠ æ‹¬å·,å³è¡¨ç¤ºæˆ(c).å› ä¸ºåœ¨ç¨‹åºä¸­cå¯èƒ½æ˜¯ä¸€ä¸ªå¤æ‚çš„è¡¨è¾¾å¼.
-// ä¾‹å¦‚å‚æ•°æ˜¯a + b,è‹¥ä¸åŠ æ‹¬å·,åˆ™åœ¨å®å®šä¹‰ä¸­å˜æˆäº†:(unsigned) a + b.è¿™æ˜¾ç„¶ä¸å¯¹.åŠ äº†æ‹¬å·å°±èƒ½æ­£ç¡®è¡¨ç¤ºæˆ(unsigned)(a + b)
-#define isascii(c) (((unsigned) (c))<=0x7f)	// æ˜¯ASCIIå­—ç¬¦
-#define toascii(c) (((unsigned) (c))&0x7f)	// è½¬æ¢æˆASCIIå­—ç¬¦
+// ÏÂÃæÁ½¸ö¶¨ÒåÖĞ,ºê²ÎÊıÇ°Ê¹ÓÃÁËÇ°×º(unsigned),Òò´ËcÓ¦¸Ã¼ÓÀ¨ºÅ,¼´±íÊ¾³É(c).ÒòÎªÔÚ³ÌĞòÖĞc¿ÉÄÜÊÇÒ»¸ö¸´ÔÓµÄ±í´ïÊ½.
+// ÀıÈç²ÎÊıÊÇa + b,Èô²»¼ÓÀ¨ºÅ,ÔòÔÚºê¶¨ÒåÖĞ±ä³ÉÁË:(unsigned) a + b.ÕâÏÔÈ»²»¶Ô.¼ÓÁËÀ¨ºÅ¾ÍÄÜÕıÈ·±íÊ¾³É(unsigned)(a + b)
+#define isascii(c) (((unsigned) (c))<=0x7f)	// ÊÇASCII×Ö·û
+#define toascii(c) (((unsigned) (c))&0x7f)	// ×ª»»³ÉASCII×Ö·û
 
-// ä»¥ä¸‹ä¸¤ä¸ªå®å®šä¹‰ä¸­ä½¿ç”¨ä¸€ä¸ªä¸´æ—¶å˜é‡_ctmpçš„åŸå› æ˜¯:åœ¨å®å®šä¹‰ä¸­,å®çš„å‚æ•°åªèƒ½è¢«ä½¿ç”¨ä¸€æ¬¡.ä½†å¯¹äºå¤šçº¿ç¨‹æ¥è¯´è¿™æ˜¯ä¸å®‰å…¨çš„,å› ä¸ºä¸¤ä¸ªæˆ–å¤šä¸ª
-// çº¿ç¨‹å¯èƒ½åœ¨åŒä¸€æ—¶åˆ»ä½¿ç”¨è¿™ä¸ªå…¬å…±ä¸´æ—¶äº¦æ˜¯.
-// å› æ­¤ä»Linux 2.2.xç‰ˆæœ¬å¼€å§‹æ›´æ”¹ä¸ºä½¿ç”¨ä¸¤ä¸ªå‡½æ•°æ¥å–ä»£è¿™ä»ä¸ªå®å®šä¹‰.
-#define tolower(c) (_ctmp=c,isupper(_ctmp)?_ctmp-('A'-'a'):_ctmp)	// è½¬æ¢æˆå°å†™å­—ç¬¦
-#define toupper(c) (_ctmp=c,islower(_ctmp)?_ctmp-('a'-'A'):_ctmp)	// è½¬æ¢æˆå¤§å†™å­—ç¬¦
+// ÒÔÏÂÁ½¸öºê¶¨ÒåÖĞÊ¹ÓÃÒ»¸öÁÙÊ±±äÁ¿_ctmpµÄÔ­ÒòÊÇ:ÔÚºê¶¨ÒåÖĞ,ºêµÄ²ÎÊıÖ»ÄÜ±»Ê¹ÓÃÒ»´Î.µ«¶ÔÓÚ¶àÏß³ÌÀ´ËµÕâÊÇ²»°²È«µÄ,ÒòÎªÁ½¸ö»ò¶à¸ö
+// Ïß³Ì¿ÉÄÜÔÚÍ¬Ò»Ê±¿ÌÊ¹ÓÃÕâ¸ö¹«¹²ÁÙÊ±ÒàÊÇ.
+// Òò´Ë´ÓLinux 2.2.x°æ±¾¿ªÊ¼¸ü¸ÄÎªÊ¹ÓÃÁ½¸öº¯ÊıÀ´È¡´úÕâ´Ó¸öºê¶¨Òå.
+#define tolower(c) (_ctmp=c,isupper(_ctmp)?_ctmp-('A'-'a'):_ctmp)	// ×ª»»³ÉĞ¡Ğ´×Ö·û
+#define toupper(c) (_ctmp=c,islower(_ctmp)?_ctmp-('a'-'A'):_ctmp)	// ×ª»»³É´óĞ´×Ö·û
 
 #endif
+

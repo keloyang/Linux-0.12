@@ -11,18 +11,18 @@
 ! system to read them from there before the area is overwritten
 ! for buffer-blocks.
 !
-! setup.s负责从BIOS中获取系统数据,并将这些数据放到系统内存适当地方.此时setup.s和system已经由bootsect引导块加载到内存中.
+! setup.s�����BIOS�л�ȡϵͳ����,������Щ���ݷŵ�ϵͳ�ڴ��ʵ��ط�.��ʱsetup.s��system�Ѿ���bootsect��������ص��ڴ���.
 !
-! 这段代码询问bios有关内存/磁盘/其他参数,并将这些参数放到一个"安全的"地方:0x90000-0x901ff,也即原来bootsect代码块曾经的地方,
-! 然后在被缓冲块覆盖掉之前由保护模式的system读取
+! ��δ���ѯ��bios�й��ڴ�/����/��������,������Щ�����ŵ�һ��"��ȫ��"�ط�:0x90000-0x901ff,Ҳ��ԭ��bootsect����������ĵط�,
+! Ȼ���ڱ�����鸲�ǵ�֮ǰ�ɱ���ģʽ��system��ȡ
 
 ! NOTE! These had better be the same as in bootsect.s!
-! 以下这些参数最好和bootsect.s中的相同!
+! ������Щ������ú�bootsect.s�е���ͬ!
 #include <linux/config.h>
 
-INITSEG  = DEF_INITSEG			! we move boot here - out of the way	! 原来bootsect所处的段.
-SYSSEG   = DEF_SYSSEG			! system loaded at 0x10000 (65536).		! system在0x10000处.
-SETUPSEG = DEF_SETUPSEG			! this is the current segment			! 本程序所在的段地址.
+INITSEG  = DEF_INITSEG			! we move boot here - out of the way	! ԭ��bootsect�����Ķ�.
+SYSSEG   = DEF_SYSSEG			! system loaded at 0x10000 (65536).		! system��0x10000��.
+SETUPSEG = DEF_SETUPSEG			! this is the current segment			! ���������ڵĶε�ַ.
 
 .globl begtext, begdata, begbss, endtext, enddata, endbss
 .text
@@ -38,57 +38,57 @@ start:
 
 ! ok, the read went well so we get current cursor position and save it for
 ! posterity.
-! ok,整个磁盘过程都正常,现在将光标位置保存以备今后使用.
+! ok,�������̹��̶�����,���ڽ����λ�ñ����Ա����ʹ��.
 
-! 下句将ds置成INITSEG(0x9000).这已经在bootsect程序中设置过,但是现在是setup程序,Linus觉得需要重新设置一下.
+! �¾佫ds�ó�INITSEG(0x9000).���Ѿ���bootsect���������ù�,����������setup����,Linus������Ҫ��������һ��.
 
 	mov	ax, #INITSEG							! this is done in bootsect already, but...
 	mov	ds, ax
 
 	! Get memory size (extended mem, kB)
-	! 取扩展内存的大小值(KB).
-	! 利用BIOS中断0x15功能号ah = 0x88取系统所扩展内存大小并保存在内存0x90002处.
-	! 返回:ax = 从0x100000(1M)处开始的扩展内存大小(KB).若出错则CF置位,ax = 出错码.
+	! ȡ��չ�ڴ�Ĵ�Сֵ(KB).
+	! ����BIOS�ж�0x15���ܺ�ah = 0x88ȡϵͳ����չ�ڴ��С���������ڴ�0x90002��.
+	! ����:ax = ��0x100000(1M)����ʼ����չ�ڴ��С(KB).��������CF��λ,ax = ������.
 	mov	ah, #0x88
 	int	0x15
-	mov	[2], ax									! 将扩展内存数值存在0x90002处(1个字).
+	mov	[2], ax									! ����չ�ڴ���ֵ����0x90002��(1����).
 
 	! check for EGA/VGA and some config parameters
-	! 检查显示方式(EGA/VGA)并取参数.
-	! 调用BIOS中断0x10,附加功能选择方式信息.功能号: ah = 0x12, bl = 0x10
-	! 返回: bh = 显示状态.0x00 - 彩色模式,I/O端口=0x3dx;0x01 - 单色模式,I/O端口=0x3bX.
-	! bl = 安装的显示内存.0x00 - 64KB;0x01 - 128KB; 0x02 - 192KB; 0x03 = 256KB.
-	! cx = 显示卡特性参数
+	! �����ʾ��ʽ(EGA/VGA)��ȡ����.
+	! ����BIOS�ж�0x10,���ӹ���ѡ��ʽ��Ϣ.���ܺ�: ah = 0x12, bl = 0x10
+	! ����: bh = ��ʾ״̬.0x00 - ��ɫģʽ,I/O�˿�=0x3dx;0x01 - ��ɫģʽ,I/O�˿�=0x3bX.
+	! bl = ��װ����ʾ�ڴ�.0x00 - 64KB;0x01 - 128KB; 0x02 - 192KB; 0x03 = 256KB.
+	! cx = ��ʾ�����Բ���
 
 	mov	ah, #0x12
 	mov	bl, #0x10
 	int	0x10
 	mov	[8], ax									! 0x90008 = ??
-	mov	[10], bx								! 0x9000A - 安装的显示内存;0x9000B = 显示状态(彩/单色)
-	mov	[12], cx								! 0x9000C = 显示卡特性参数.
-	! 检测屏幕当前行列值.若显示卡是VGA卡时则请求用户选择显示行列值,并保存到0x9000E处.
-	mov	ax, #0x5019								! 在ax中预置屏幕默认行列值(ah = 80列;al = 25行).
-	cmp	bl, #0x10								! 若中断返回bl值为0x10,则表示不是VGA显示卡,跳转
+	mov	[10], bx								! 0x9000A - ��װ����ʾ�ڴ�;0x9000B = ��ʾ״̬(��/��ɫ)
+	mov	[12], cx								! 0x9000C = ��ʾ�����Բ���.
+	! �����Ļ��ǰ����ֵ.����ʾ����VGA��ʱ�������û�ѡ����ʾ����ֵ,�����浽0x9000E��.
+	mov	ax, #0x5019								! ��ax��Ԥ����ĻĬ������ֵ(ah = 80��;al = 25��).
+	cmp	bl, #0x10								! ���жϷ���blֵΪ0x10,���ʾ����VGA��ʾ��,��ת
 	je	novga
-	call	chsvga								! 检测显示卡厂家和类型,修改显示行列值
+	call	chsvga								! �����ʾ�����Һ�����,�޸���ʾ����ֵ
 novga:
-	mov	[14], ax								! 保存屏幕当前行列值(0x9000E, 0x9000F).
+	mov	[14], ax								! ������Ļ��ǰ����ֵ(0x9000E, 0x9000F).
 
-	! 这段代码使用BIOS中断取屏幕当前光标位置(列,行),并保存在内存0x90000处(2字节).
-	! 控制台初始化程序会到此处读取该值.
-	! BIOS中断0x10功能号ah = 0x03,读光标位置.
-	! 输入:bh = 页号
-	! 返回:ch = 扫描开始线; cl = 扫描结束线; dh = 行号(0x00顶端); dl = 列号(0x00最左边).
+	! ��δ���ʹ��BIOS�ж�ȡ��Ļ��ǰ���λ��(��,��),���������ڴ�0x90000��(2�ֽ�).
+	! ����̨��ʼ������ᵽ�˴���ȡ��ֵ.
+	! BIOS�ж�0x10���ܺ�ah = 0x03,�����λ��.
+	! ����:bh = ҳ��
+	! ����:ch = ɨ�迪ʼ��; cl = ɨ�������; dh = �к�(0x00����); dl = �к�(0x00�����).
 	mov	ah, #0x03								! read cursor pos
 	xor	bh, bh
 	int	0x10									! save it in known place, con_init fetches
 	mov	[0], dx									! it from 0x90000.
 
 	! Get video-card data:
-	! 下面这段用于取显示卡当前显示模式:
-	! 调用BIOS中断0x10,功能号 ah = 0x0f
-	! 返回: ah = 字符列数; al = 显示模式; bh = 当前显示页.
-	! 0x90004(1字)存放当前页;0x90006存放显示模式;0x90007存放字符列数.
+	! �����������ȡ��ʾ����ǰ��ʾģʽ:
+	! ����BIOS�ж�0x10,���ܺ� ah = 0x0f
+	! ����: ah = �ַ�����; al = ��ʾģʽ; bh = ��ǰ��ʾҳ.
+	! 0x90004(1��)��ŵ�ǰҳ;0x90006�����ʾģʽ;0x90007����ַ�����.
 
 	mov	ah, #0x0f
 	int	0x10
@@ -96,20 +96,20 @@ novga:
 	mov	[6], ax									! al = video mode, ah = window width
 
 	! Get hd0 data
-	! 取第一个硬盘的信息(复制硬盘参数表).
-	! 第1个硬盘参数表的首地址竟然是中断向量0x41的向量值!而第2个硬盘参数表紧接在第1个表的后面,中断向量0x46的向量值也指向第2个
-	! 硬盘的参数表首址.表的长度是16个字节.
-	! 下面两段程序分别复制ROM BIOS中有关两个硬盘的参数表,0x90080处存放第1个硬盘的表,0x90090处存放第2个硬盘的表.
+	! ȡ��һ��Ӳ�̵���Ϣ(����Ӳ�̲�����).
+	! ��1��Ӳ�̲��������׵�ַ��Ȼ���ж�����0x41������ֵ!����2��Ӳ�̲����������ڵ�1�����ĺ���,�ж�����0x46������ֵҲָ���2��
+	! Ӳ�̵Ĳ�������ַ.���ĳ�����16���ֽ�.
+	! �������γ���ֱ���ROM BIOS���й�����Ӳ�̵Ĳ�����,0x90080����ŵ�1��Ӳ�̵ı�,0x90090����ŵ�2��Ӳ�̵ı�.
 
-	! lds si,[4*0x41]从内存指定位置处读取一个长指针值并放入ds和si寄存器中.ds中放段地址,si是段内偏移地址.这里是把内存地址
-	! 4 * 0x41 (= 0x104)处保存的4个字节读出.这4字节即是硬盘参数表所处位置的段和偏移值.
+	! lds si,[4*0x41]���ڴ�ָ��λ�ô���ȡһ����ָ��ֵ������ds��si�Ĵ�����.ds�зŶε�ַ,si�Ƕ���ƫ�Ƶ�ַ.�����ǰ��ڴ��ַ
+	! 4 * 0x41 (= 0x104)�������4���ֽڶ���.��4�ֽڼ���Ӳ�̲���������λ�õĶκ�ƫ��ֵ.
 	mov	ax, #0x0000
 	mov	ds, ax
-	lds	si, [4 * 0x41]							! 取中断向量0x41的值,即hd0参数表的地址--ds:si
+	lds	si, [4 * 0x41]							! ȡ�ж�����0x41��ֵ,��hd0�������ĵ�ַ--ds:si
 	mov	ax, #INITSEG
 	mov	es, ax
-	mov	di, #0x0080								! 传输目的地址: 0x9000:0x0080 --es:di
-	mov	cx, #0x10								! 共传输16字节.
+	mov	di, #0x0080								! ����Ŀ�ĵ�ַ: 0x9000:0x0080 --es:di
+	mov	cx, #0x10								! ������16�ֽ�.
 	rep
 	movsb
 
@@ -117,29 +117,29 @@ novga:
 
 	mov	ax, #0x0000
 	mov	ds, ax
-	lds	si, [4 * 0x46]							! 取中断向量0x46的值,即hd1参数表的地址--ds:si
+	lds	si, [4 * 0x46]							! ȡ�ж�����0x46��ֵ,��hd1�������ĵ�ַ--ds:si
 	mov	ax, #INITSEG
 	mov	es, ax
-	mov	di, #0x0090								! 传输目的地址: 0x9000:0x0090 --es:di
+	mov	di, #0x0090								! ����Ŀ�ĵ�ַ: 0x9000:0x0090 --es:di
 	mov	cx, #0x10
 	rep
 	movsb
 
 	! Check that there IS a hd1 :-)
-	! 检测系统是否有第2个硬盘.如果没有则把第2个表清零.
-	! 利用BIOS中断调用0x13的取盘类型功能,功能号 ah = 0x15;
-	! 输入: dl = 驱动器号(0x8X是硬盘;0x80指第1个硬盘,0x81第2个硬盘)
-	! 输出: ah = 类型码; 00 没有这个盘,CF置位;01 是软驱,没有change-line支持;
-	! 02 是软驱(或其它可移动设备),有change-line支持; 03 是硬盘.
+	! ���ϵͳ�Ƿ��е�2��Ӳ��.���û����ѵ�2��������.
+	! ����BIOS�жϵ���0x13��ȡ�����͹���,���ܺ� ah = 0x15;
+	! ����: dl = ��������(0x8X��Ӳ��;0x80ָ��1��Ӳ��,0x81��2��Ӳ��)
+	! ���: ah = ������; 00 û�������,CF��λ;01 ������,û��change-line֧��;
+	! 02 ������(���������ƶ��豸),��change-line֧��; 03 ��Ӳ��.
 
 	mov	ax, #0x01500
 	mov	dl, #0x81
 	int	0x13
 	jc	no_disk1
-	cmp	ah, #3									! 是硬盘吗?(类型 = 3?).
+	cmp	ah, #3									! ��Ӳ����?(���� = 3?).
 	je	is_disk1
 no_disk1:
-	mov	ax, #INITSEG							! 第2个硬盘不存在,则对第2个硬盘表清零.
+	mov	ax, #INITSEG							! ��2��Ӳ�̲�����,��Ե�2��Ӳ�̱�����.
 	mov	es, ax
 	mov	di, #0x0090
 	mov	cx, #0x10
@@ -149,55 +149,55 @@ no_disk1:
 is_disk1:
 
 ! now we want to move to protected mode ...
-! 现在我们要进入保护模式中了...
+! ��������Ҫ���뱣��ģʽ����...
 
-	cli											! no interrupts allowed !	! 从此开始不允许中断.
+	cli											! no interrupts allowed !	! �Ӵ˿�ʼ�������ж�.
 
 	! first we move the system to it's rightful place
-	! 首先我们将system模块移到正确的位置.
-	! bootsect引导程序会把system模块读入到内存0x10000(64KB)开始的位置.由于当时假设system模块最大长度不会超过0x80000(512KB),即其
-	! 末端不会超过内存地址0x90000,所以bootsect会把自己移动到0x90000开始的地方,并把setup加载到它的后面.下面这段程序的用途是把整个
-	! system模块移动到0x00000位置,即把从0x10000到0x8ffff的内存数据块(512KB)整块地向内存低端移动了0x10000(64KB)的位置.
+	! �������ǽ�systemģ���Ƶ���ȷ��λ��.
+	! bootsect����������systemģ����뵽�ڴ�0x10000(64KB)��ʼ��λ��.���ڵ�ʱ����systemģ����󳤶Ȳ��ᳬ��0x80000(512KB),����
+	! ĩ�˲��ᳬ���ڴ��ַ0x90000,����bootsect����Լ��ƶ���0x90000��ʼ�ĵط�,����setup���ص����ĺ���.������γ������;�ǰ�����
+	! systemģ���ƶ���0x00000λ��,���Ѵ�0x10000��0x8ffff���ڴ����ݿ�(512KB)��������ڴ�Ͷ��ƶ���0x10000(64KB)��λ��.
 
 	mov	ax, #0x0000
 	cld											! 'direction'=0, movs moves forward
 do_move:
-	mov	es, ax									! destination segment	! es:di是目的地址(初始为0x0:0x0)
+	mov	es, ax									! destination segment	! es:di��Ŀ�ĵ�ַ(��ʼΪ0x0:0x0)
 	add	ax, #0x1000
-	cmp	ax, #0x9000								! 已经把最后一段(从0x8000段开始的64KB)代码移动完.
-	jz	end_move								! 是,则跳转.
-	mov	ds, ax									! source segment	! ds:si是源地址(初始为0x1000:0x0)
+	cmp	ax, #0x9000								! �Ѿ������һ��(��0x8000�ο�ʼ��64KB)�����ƶ���.
+	jz	end_move								! ��,����ת.
+	mov	ds, ax									! source segment	! ds:si��Դ��ַ(��ʼΪ0x1000:0x0)
 	sub	di, di
 	sub	si, si
-	mov cx, #0x8000								! 移动0x8000字(64KB).
+	mov cx, #0x8000								! �ƶ�0x8000��(64KB).
 	rep
 	movsw
 	jmp	do_move
 
 	! then we load the segment descriptors
-	! 此后,我们加载段描述符.
+	! �˺�,���Ǽ��ض�������.
 	!
-	! 下面指令lidt用于加载中断描述符表(IDT)寄存器.它的操作数(idt_48)有6个字节.前2个字节(字节0-1)是描述符表的字节长度值;后4字节(字节2-5)是描述符表
-	! 的32位线性基地址.中断描述符表中的每一个8字节表项指出发生中断时需要调用的代码信息.与中断向量有些相似,但要包含更多的信息.
+	! ����ָ��lidt���ڼ����ж���������(IDT)�Ĵ���.���Ĳ�����(idt_48)��6���ֽ�.ǰ2���ֽ�(�ֽ�0-1)�������������ֽڳ���ֵ;��4�ֽ�(�ֽ�2-5)����������
+	! ��32λ���Ի���ַ.�ж����������е�ÿһ��8�ֽڱ���ָ�������ж�ʱ��Ҫ���õĴ�����Ϣ.���ж�������Щ����,��Ҫ�����������Ϣ.
 	!
-	! lgdt指令用于加载全局描述符表(GDT)寄存器,其操作数格式与lidt指令的相同.全局描述符表中的每个符项(8字节)描述了保护模式下数据段和代码段(块)的信息.其
-	! 中包括段的最大长限制(16位),段的线性地址基址(32位)/段的特权级,段是否在内存,读写许可权以及其他一些保护模式运行的标志.
+	! lgdtָ�����ڼ���ȫ����������(GDT)�Ĵ���,���������ʽ��lidtָ�����ͬ.ȫ�����������е�ÿ������(8�ֽ�)�����˱���ģʽ�����ݶκʹ����(��)����Ϣ.��
+	! �а����ε��������(16λ),�ε����Ե�ַ��ַ(32λ)/�ε���Ȩ��,���Ƿ����ڴ�,��д����Ȩ�Լ�����һЩ����ģʽ���еı�־.
 end_move:
 	mov	ax, #SETUPSEG							! right, forgot this at first. didn't work :-)
-	mov	ds, ax									! ds指向本程序(setup)段.
-	lidt	idt_48								! load idt with 0,0	! 加载IDT寄存器.
-	lgdt	gdt_48								! load gdt with whatever appropriate	! 加载GDT寄存器.
+	mov	ds, ax									! dsָ�򱾳���(setup)��.
+	lidt	idt_48								! load idt with 0,0	! ����IDT�Ĵ���.
+	lgdt	gdt_48								! load gdt with whatever appropriate	! ����GDT�Ĵ���.
 
 	! that was painless, now we enable A20
-	! 以上的操作很简单,现在我们开启A20地址线.
-	! 为了能够访问和使用1MB以上的物理内存,我们需要首先开启A20地址线.
-	call	empty_8042							! 测试8042状态寄存器,等待输入缓冲器空. 只有当输入缓冲器为空时才可以对其执行命令.
-	mov	al, #0xD1								! command write	! 0xD1命令码--表示要写数据到8042的P2端口.P2端口位1用于A20线的选通.
+	! ���ϵĲ����ܼ�,�������ǿ���A20��ַ��.
+	! Ϊ���ܹ����ʺ�ʹ��1MB���ϵ������ڴ�,������Ҫ���ȿ���A20��ַ��.
+	call	empty_8042							! ����8042״̬�Ĵ���,�ȴ����뻺������. ֻ�е����뻺����Ϊ��ʱ�ſ��Զ���ִ������.
+	mov	al, #0xD1								! command write	! 0xD1������--��ʾҪд���ݵ�8042��P2�˿�.P2�˿�λ1����A20�ߵ�ѡͨ.
 	out	#0x64, al
-	call	empty_8042							! 等待输入缓冲器空,看命令是否被接受.
-	mov	al, #0xDF								! A20 on	! 选通A20地址线的参数.
-	out	#0x60, al								! 数据要写到0x60端口.
-	call	empty_8042							! 若此时输入缓冲器为空,则表示A20线已经选通.
+	call	empty_8042							! �ȴ����뻺������,�������Ƿ񱻽���.
+	mov	al, #0xDF								! A20 on	! ѡͨA20��ַ�ߵĲ���.
+	out	#0x60, al								! ����Ҫд��0x60�˿�.
+	call	empty_8042							! ����ʱ���뻺����Ϊ��,���ʾA20���Ѿ�ѡͨ.
 
 ! well, that went ok, I hope. Now we have to reprogram the interrupts :-(
 ! we put them right after the intel-reserved hardware interrupts, at
@@ -207,44 +207,44 @@ end_move:
 ! which is used for the internal hardware interrupts as well. We just
 ! have to reprogram the 8259's, and it isn't fun.
 
-! .word	0x00eb,0x00eb是直接使用机器码表示的两条相对跳转指令,起延时作用.0xeb是直接近跳转指令的操作码,带1个字节的相对位移值.因此跳转范围是
-! -127--127.CPU通过把这个相对位移值加到EIP寄存器中就形成一个新的有效地址.此时EIP指向下一条被执行的指令.执行时所花费的CPU时钟周期数是7至10
-! 个.0x00eb表示跳转值是0的一条指令,因此还是直接执行下一条指令.这两条指令共可提供14--20个CPU时钟周期的延迟时间.在as86上没有表示相应指令的助
-! 记符,因此Linus在setup.s等一些汇编程序中就直接使用机器码来表示这种指令.另外,每个空操作指令NOP的时钟周期数是3个,因此若要达到相同的延迟效果
-! 就需要6~7个NOP指令.
+! .word	0x00eb,0x00eb��ֱ��ʹ�û������ʾ�����������תָ��,����ʱ����.0xeb��ֱ�ӽ���תָ��Ĳ�����,��1���ֽڵ����λ��ֵ.�����ת��Χ��
+! -127--127.CPUͨ����������λ��ֵ�ӵ�EIP�Ĵ����о��γ�һ���µ���Ч��ַ.��ʱEIPָ����һ����ִ�е�ָ��.ִ��ʱ�����ѵ�CPUʱ����������7��10
+! ��.0x00eb��ʾ��תֵ��0��һ��ָ��,��˻���ֱ��ִ����һ��ָ��.������ָ����ṩ14--20��CPUʱ�����ڵ��ӳ�ʱ��.��as86��û�б�ʾ��Ӧָ�����
+! �Ƿ�,���Linus��setup.s��һЩ�������о�ֱ��ʹ�û���������ʾ����ָ��.����,ÿ���ղ���ָ��NOP��ʱ����������3��,�����Ҫ�ﵽ��ͬ���ӳ�Ч��
+! ����Ҫ6~7��NOPָ��.
 
-! 8259芯片主片端口是0x20-0x21,从片端口是0xA0-0xA1.输出值0x11表示初始化命令开始,它是ICW1命令字,表示边沿触发,多片8269级连,最后要发送ICW4
-! 命令字.
+! 8259оƬ��Ƭ�˿���0x20-0x21,��Ƭ�˿���0xA0-0xA1.���ֵ0x11��ʾ��ʼ�����ʼ,����ICW1������,��ʾ���ش���,��Ƭ8269����,���Ҫ����ICW4
+! ������.
 
 	mov	al, #0x11								! initialization sequence
-	out	#0x20, al								! send it to 8259A-1	! 发送到8259A主芯片.
-	.word	0x00eb, 0x00eb						! jmp $+2, jmp $+2	! '$'表示当前指令的地址.
-	out	#0xA0, al								! and to 8259A-2	! 再发送到8259A从芯片.
+	out	#0x20, al								! send it to 8259A-1	! ���͵�8259A��оƬ.
+	.word	0x00eb, 0x00eb						! jmp $+2, jmp $+2	! '$'��ʾ��ǰָ��ĵ�ַ.
+	out	#0xA0, al								! and to 8259A-2	! �ٷ��͵�8259A��оƬ.
 	.word	0x00eb, 0x00eb
-	! Linux系统硬件中断号被设置成从0x20开始.
+	! LinuxϵͳӲ���жϺű����óɴ�0x20��ʼ.
 	mov	al, #0x20								! start of hardware int's (0x20)
-	out	#0x21, al								! 送主芯片ICW2命令字,设置起始中断号,要送奇端口.
+	out	#0x21, al								! ����оƬICW2������,������ʼ�жϺ�,Ҫ����˿�.
 	.word	0x00eb, 0x00eb
 	mov	al, #0x28								! start of hardware int's 2 (0x28)
-	out	#0xA1, al								! 送从芯片ICW2命令字,从芯片的起始中断号.
+	out	#0xA1, al								! �ʹ�оƬICW2������,��оƬ����ʼ�жϺ�.
 	.word	0x00eb, 0x00eb
 
 	mov	al, #0x04								! 8259-1 is master
-	out	#0x21, al								! 送主芯片ICW3命令字,主芯片的IR2连从芯片INT.
+	out	#0x21, al								! ����оƬICW3������,��оƬ��IR2����оƬINT.
 	.word	0x00eb, 0x00eb
 	mov	al, #0x02								! 8259-2 is slave
-	out	#0xA1, al								! 送从芯片ICW3命令字,主芯片的IR2连从芯片的INT连到主芯片的IR2引脚上.
+	out	#0xA1, al								! �ʹ�оƬICW3������,��оƬ��IR2����оƬ��INT������оƬ��IR2������.
 
 	.word	0x00eb, 0x00eb
 	mov	al, #0x01								! 8086 mode for both
-	out	#0x21, al								! 送主芯片ICW4命令字.8086模式;普通EOI,非缓冲方式,需发送指令来.初始化结束,芯片就绪.
+	out	#0x21, al								! ����оƬICW4������.8086ģʽ;��ͨEOI,�ǻ��巽ʽ,�跢��ָ����.��ʼ������,оƬ����.
 	.word	0x00eb, 0x00eb
-	out	#0xA1, al								! 送从芯片ICW4命令字,内容同上.
+	out	#0xA1, al								! �ʹ�оƬICW4������,����ͬ��.
 	.word	0x00eb, 0x00eb
 	mov	al, #0xFF								! mask off all interrupts for now
-	out	#0x21, al								! 屏蔽主芯片所有中断请求.
+	out	#0x21, al								! ������оƬ�����ж�����.
 	.word	0x00eb, 0x00eb
-	out	#0xA1, al								! 屏蔽从芯片所有中断请求.
+	out	#0xA1, al								! ���δ�оƬ�����ж�����.
 
 	! well, that certainly wasn't fun :-(. Hopefully it works, and we don't
 	! need no steenking BIOS anyway (except for the initial loading :-).
@@ -256,31 +256,31 @@ end_move:
 	! we let the gnu-compiled 32-bit programs do that. We just jump to
 	! absolute address 0x00000, in 32-bit protected mode.
 	!
-	! 下面设置并进入32位保护模式运行.首先加载机器状态字,也称控制寄存器CR0,其位0置1将导致CPU切换到保护模式,并且运行在特权级0中,即当前
-	! 特权级CPL=0.此时段寄存器仍然指向与实地址模式中相同的线性地址处(在实地址模式下线性地址与物理内存地址相同).在设置该位后,随后一条指
-	! 令必须是一条段间跳转指令以用于刷新CPU当前指令队列.因为CPU是在执行一条指令之前就已从内存读取该指令并对其进行解码.然而在进入保护模式
-	! 以后那些属于实模式的承先取得的指令信息就变得不再有效.而一条段间跳转指令就会刷新CPU的当前指令队列,即丢弃这些无效信息.另外,在Intel
-	! 公司的手册上建议80386或以上CPU应该使用指令"mov cr0,ax"切换到保护模式.lmsw指令仅用于兼容以前的286CPU.
+	! �������ò�����32λ����ģʽ����.���ȼ��ػ���״̬��,Ҳ�ƿ��ƼĴ���CR0,��λ0��1������CPU�л�������ģʽ,������������Ȩ��0��,����ǰ
+	! ��Ȩ��CPL=0.��ʱ�μĴ�����Ȼָ����ʵ��ַģʽ����ͬ�����Ե�ַ��(��ʵ��ַģʽ�����Ե�ַ�������ڴ��ַ��ͬ).�����ø�λ��,���һ��ָ
+	! �������һ���μ���תָ��������ˢ��CPU��ǰָ�����.��ΪCPU����ִ��һ��ָ��֮ǰ���Ѵ��ڴ��ȡ��ָ�������н���.Ȼ���ڽ��뱣��ģʽ
+	! �Ժ���Щ����ʵģʽ�ĳ���ȡ�õ�ָ����Ϣ�ͱ�ò�����Ч.��һ���μ���תָ��ͻ�ˢ��CPU�ĵ�ǰָ�����,��������Щ��Ч��Ϣ.����,��Intel
+	! ��˾���ֲ��Ͻ���80386������CPUӦ��ʹ��ָ��"mov cr0,ax"�л�������ģʽ.lmswָ������ڼ�����ǰ��286CPU.
 
-	mov	ax, #0x0001								! protected mode (PE) bit	! 保护模式位(PE).
-	lmsw	ax									! This is it!			! 就这样加载机器状态字!
-	jmpi	0, 8								! jmp offset 0 of segment 8 (cs)	! 跳转至cs段偏移0处.
-	! 我们已经将system模块移动到0x00000开始的地方,所以上句中的偏移地址是0.而段值8已经是保护模式下的段选择符了,用于选择描述符表和描述符表
-	! 项以及所要求的特权级.段选择符长度为16位(2字节);位0-1表示请求的特权级0--3,但Linux操作系统只用到两级;0级(内核级)和3级(用户级);位2
-	! 用于选择全局描述符表(0)还是局部描述符表(1);位3-15是描述符表项的索引,指出选择第几项描述符.所以段选择符8(0b0000,0000,0000,1000)
-	! 表示请求特权级0,使用全局描述符表GD中第2个段描述符项,该项指出代码的基地址是0,因此这里的跳转指令就会去执行system中的代码.
+	mov	ax, #0x0001								! protected mode (PE) bit	! ����ģʽλ(PE).
+	lmsw	ax									! This is it!			! ���������ػ���״̬��!
+	jmpi	0, 8								! jmp offset 0 of segment 8 (cs)	! ��ת��cs��ƫ��0��.
+	! �����Ѿ���systemģ���ƶ���0x00000��ʼ�ĵط�,�����Ͼ��е�ƫ�Ƶ�ַ��0.����ֵ8�Ѿ��Ǳ���ģʽ�µĶ�ѡ�����,����ѡ��������������������
+	! ���Լ���Ҫ�����Ȩ��.��ѡ�������Ϊ16λ(2�ֽ�);λ0-1��ʾ�������Ȩ��0--3,��Linux����ϵͳֻ�õ�����;0��(�ں˼�)��3��(�û���);λ2
+	! ����ѡ��ȫ����������(0)���Ǿֲ���������(1);λ3-15�����������������,ָ��ѡ��ڼ���������.���Զ�ѡ���8(0b0000,0000,0000,1000)
+	! ��ʾ������Ȩ��0,ʹ��ȫ����������GD�е�2������������,����ָ������Ļ���ַ��0,����������תָ��ͻ�ȥִ��system�еĴ���.
 
 ! This routine checks that the keyboard command queue is empty
 ! No timeout is used - if this hangs there is something wrong with
 ! the machine, and we probably couldn't proceed anyway.
-! 下面这个子程序检查键盘命令队列是否为空.这里不使用超时方法.
-! 如果这里死机,则说明PC有问题,我们就没有办法再处理下去了.
+! ��������ӳ����������������Ƿ�Ϊ��.���ﲻʹ�ó�ʱ����.
+! �����������,��˵��PC������,���Ǿ�û�а취�ٴ�����ȥ��.
 !
-! 只有当输入缓冲器为空时(键盘控制器状态寄存器位1=0)才可以对其执行写命令.
+! ֻ�е����뻺����Ϊ��ʱ(���̿�����״̬�Ĵ���λ1=0)�ſ��Զ���ִ��д����.
 empty_8042:
 	.word	0x00eb, 0x00eb
-	in	al, #0x64								! 8042 status port	! 读AT键盘控制器状态寄存器
-	test	al, #2								! is input buffer full?	! 测试位1,输入缓冲器满?
+	in	al, #0x64								! 8042 status port	! ��AT���̿�����״̬�Ĵ���
+	test	al, #2								! is input buffer full?	! ����λ1,���뻺������?
 	jnz	empty_8042								! yes - loop
 	ret
 
@@ -674,31 +674,31 @@ docr:
 	pop	ax
 	ret
 
-! 全局描述符表开始处.描述符表由多个8字节长的描述符项组成.这里给出了3个描述符项.
-! 第1项无用,但须存在.第2项的系统代码段描述符,第3项是系统数据段描述符.
+! ȫ������������ʼ��.���������ɶ��8�ֽڳ��������������.���������3����������.
+! ��1������,�������.��2���ϵͳ�����������,��3����ϵͳ���ݶ�������.
 gdt:
-	.word	0, 0, 0, 0						! dummy	! 第1个描述符,不用.
+	.word	0, 0, 0, 0						! dummy	! ��1��������,����.
 
-	! 在GDT表 这里的偏移量是0x08.它是内核代码段选择符的值.
-	.word	0x07FF							! 8Mb - limit=2047 (2048*4096=8Mb)	! (0~2047,因此是2048*4096B=8MB)
+	! ��GDT�� �����ƫ������0x08.�����ں˴����ѡ�����ֵ.
+	.word	0x07FF							! 8Mb - limit=2047 (2048*4096=8Mb)	! (0~2047,�����2048*4096B=8MB)
 	.word	0x0000							! base address=0
-	.word	0x9A00							! code read/exec			! 代码段为只读,可执行.
-	.word	0x00C0							! granularity=4096, 386			! 颗粒度为4096,32位模式.
+	.word	0x9A00							! code read/exec			! �����Ϊֻ��,��ִ��.
+	.word	0x00C0							! granularity=4096, 386			! ������Ϊ4096,32λģʽ.
 
-	! 在GDT表中这里的偏移量是0x10,它是内核数据段选择符的值.
+	! ��GDT���������ƫ������0x10,�����ں����ݶ�ѡ�����ֵ.
 	.word	0x07FF							! 8Mb - limit=2047 (2048*4096=8Mb)	! (2048*4096B=8MB)
 	.word	0x0000							! base address=0
-	.word	0x9200							! data read/write			! 数据段为可读可写.
-	.word	0x00C0							! granularity=4096, 386			! 颗粒度为4096,32位模式.
+	.word	0x9200							! data read/write			! ���ݶ�Ϊ�ɶ���д.
+	.word	0x00C0							! granularity=4096, 386			! ������Ϊ4096,32λģʽ.
 
-! 下面是加载中断描述符表寄存器idtr的指令lidt要求的6字节操作数.前2字节的IDT 的限长,后4字节是idt表在线性地址空间中的32位基地址.CPU要求在进入
-! 保护模式之前需设置IDT表,因此这里先设置一个长度为0的空表.
+! �����Ǽ����ж����������Ĵ���idtr��ָ��lidtҪ���6�ֽڲ�����.ǰ2�ֽڵ�IDT ���޳�,��4�ֽ���idt�������Ե�ַ�ռ��е�32λ����ַ.CPUҪ���ڽ���
+! ����ģʽ֮ǰ������IDT��,�������������һ������Ϊ0�Ŀձ�.
 idt_48:
 	.word	0								! idt limit=0
 	.word	0, 0							! idt base=0L
 
-! 这是加载全局描述符表寄存器gdtr的指令lgdt要求的6字节操作数.前2字节是gdt的限长,后4字节是gdt表的线性基地址.这里全局表长度设置为2KB(0x7ff即可),
-! 因为每8字节组成一个段描述符项,所以表中共可有256面.4字节的线性基地址为0x0009<<16+0x0200+gdt,即0x90200+gdt.(符号gdt是全局表在本 段中的偏移地址)
+! ���Ǽ���ȫ�����������Ĵ���gdtr��ָ��lgdtҪ���6�ֽڲ�����.ǰ2�ֽ���gdt���޳�,��4�ֽ���gdt�������Ի���ַ.����ȫ�ֱ���������Ϊ2KB(0x7ff����),
+! ��Ϊÿ8�ֽ����һ������������,���Ա��й�����256��.4�ֽڵ����Ի���ַΪ0x0009<<16+0x0200+gdt,��0x90200+gdt.(����gdt��ȫ�ֱ��ڱ� ���е�ƫ�Ƶ�ַ)
 gdt_48:
 	.word	0x800							! gdt limit=2048, 256 GDT entries
 	.word	512 + gdt, 0x9					! gdt base = 0X9xxxx
@@ -747,3 +747,4 @@ endtext:
 enddata:
 .bss
 endbss:
+

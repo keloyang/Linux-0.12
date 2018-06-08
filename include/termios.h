@@ -3,288 +3,289 @@
 
 #include <sys/types.h>
 
-#define TTY_BUF_SIZE 1024               // ttyä¸­çš„ç¼“å†²åŒºé•¿åº¦ã€‚
+#define TTY_BUF_SIZE 1024               // ttyÖĞµÄ»º³åÇø³¤¶È¡£
 
 /* 0x54 is just a magic number to make these relatively uniqe ('T') */
-/* 0x54 åªæ˜¯ä¸€ä¸ªé­”æ•°ï¼Œç›®çš„æ˜¯ä¸ºäº†ä½¿è¿™äº›å¸¸æ•°å”¯ä¸€ï¼ˆ'T'ï¼‰*/
+/* 0x54 Ö»ÊÇÒ»¸öÄ§Êı£¬Ä¿µÄÊÇÎªÁËÊ¹ÕâĞ©³£ÊıÎ¨Ò»£¨'T'£©*/
 
-// ttyè®¾å¤‡çš„ioctlè°ƒç”¨å‘½ä»¤é›†ã€‚ioctlå°†å‘½ä»¤ç¼–ç åœ¨ä½ä½å­—ä¸­ã€‚
-// ä¸‹é¢åç§°TC[*]çš„å«ä¹‰æ˜¯ttyæ§åˆ¶å‘½ä»¤ã€‚
-// å–ç›¸åº”ç»ˆç«¯termiosç»“æ„ä¸­çš„ä¿¡æ¯ï¼ˆå‚è§tcgetattr()ï¼‰ã€‚
+// ttyÉè±¸µÄioctlµ÷ÓÃÃüÁî¼¯¡£ioctl½«ÃüÁî±àÂëÔÚµÍÎ»×ÖÖĞ¡£
+// ÏÂÃæÃû³ÆTC[*]µÄº¬ÒåÊÇtty¿ØÖÆÃüÁî¡£
+// È¡ÏàÓ¦ÖÕ¶Ëtermios½á¹¹ÖĞµÄĞÅÏ¢£¨²Î¼ûtcgetattr()£©¡£
 #define TCGETS		0x5401
-// è®¾ç½®ç›¸åº”ç»ˆç«¯termiosç»“æ„ä¸­çš„ä¿¡æ¯ï¼ˆå‚è§tcsetattr()ï¼ŒTCSANOWï¼‰ã€‚
+// ÉèÖÃÏàÓ¦ÖÕ¶Ëtermios½á¹¹ÖĞµÄĞÅÏ¢£¨²Î¼ûtcsetattr()£¬TCSANOW£©¡£
 #define TCSETS		0x5402
-// åœ¨è®¾ç½®ç›¸åº”ç»ˆç«¯termiosçš„ä¿¡æ¯ä¹‹å‰ï¼Œéœ€è¦å…ˆç­‰å¾…è¾“å‡ºé˜Ÿåˆ—ä¸­æ‰€æœ‰æ•°æ®å¤„ç†å®Œï¼ˆè€—å°½ï¼‰ã€‚å¯¹äºä¿®æ”¹å‚æ•°ä¼šå½±å“è¾“å‡ºçš„æƒ…å†µï¼Œ
-// å°±éœ€è¦ä½¿ç”¨è¿™ç§å½¢å¼ï¼ˆå‚è§tcsetattr()ï¼ŒTCSADRAINé€‰é¡¹ï¼‰ã€‚
+// ÔÚÉèÖÃÏàÓ¦ÖÕ¶ËtermiosµÄĞÅÏ¢Ö®Ç°£¬ĞèÒªÏÈµÈ´ıÊä³ö¶ÓÁĞÖĞËùÓĞÊı¾İ´¦ÀíÍê£¨ºÄ¾¡£©¡£¶ÔÓÚĞŞ¸Ä²ÎÊı»áÓ°ÏìÊä³öµÄÇé¿ö£¬
+// ¾ÍĞèÒªÊ¹ÓÃÕâÖÖĞÎÊ½£¨²Î¼ûtcsetattr()£¬TCSADRAINÑ¡Ïî£©¡£
 #define TCSETSW		0x5403
-// åœ¨è®¾ç½®termiosçš„ä¿¡æ¯ä¹‹å‰ï¼Œéœ€è¦å…ˆç­‰å¾…è¾“å‡ºé˜Ÿåˆ—ä¸­æ‰€æœ‰æ•°æ®å¤„ç†å®Œï¼Œå¹¶ä¸”åˆ·æ–°ï¼ˆæ¸…ç©ºï¼‰è¾“å…¥é˜Ÿåˆ—ï¼Œå†è®¾ç½®ï¼ˆå‚è§
-// tcsetattr()ï¼ŒTCSAFLUSHé€‰é¡¹ï¼‰ã€‚
+// ÔÚÉèÖÃtermiosµÄĞÅÏ¢Ö®Ç°£¬ĞèÒªÏÈµÈ´ıÊä³ö¶ÓÁĞÖĞËùÓĞÊı¾İ´¦ÀíÍê£¬²¢ÇÒË¢ĞÂ£¨Çå¿Õ£©ÊäÈë¶ÓÁĞ£¬ÔÙÉèÖÃ£¨²Î¼û
+// tcsetattr()£¬TCSAFLUSHÑ¡Ïî£©¡£
 #define TCSETSF		0x5404
-// å–ç›¸åº”ç»ˆç«¯termioç»“æ„å¬ä¿¡æ¯ï¼ˆå‚è§tcgetattr()ï¼‰ã€‚
+// È¡ÏàÓ¦ÖÕ¶Ëtermio½á¹¹ÌıĞÅÏ¢£¨²Î¼ûtcgetattr()£©¡£
 #define TCGETA		0x5405
-// è®¾ç½®ç›¸åº”ç»ˆç«¯termioç»“æ„ä¸­çš„ä¿¡æ¯ï¼ˆå‚è§tcsetattr()ï¼ŒTCSANOWé€‰é¡¹ï¼‰ã€‚
+// ÉèÖÃÏàÓ¦ÖÕ¶Ëtermio½á¹¹ÖĞµÄĞÅÏ¢£¨²Î¼ûtcsetattr()£¬TCSANOWÑ¡Ïî£©¡£
 #define TCSETA		0x5406
-// åœ¨è®¾ç½®ç»ˆç«¯termioçš„ä¿¡æ¯ä¹‹å‰ï¼Œéœ€è¦å…ˆç­‰å¾…è¾“å‡ºé˜Ÿåˆ—ä¸­æ‰€æœ‰æ•°æ®å¤„ç†å®Œï¼ˆè€—å°½ï¼‰ã€‚å¯¹äºä¿®æ”¹å‚æ•°ä¼šå½±å“è¾“å‡ºçš„æƒ…å†µï¼Œå°±éœ€è¦
-// ä½¿ç”¨è¿™ç§å½¢å¼ï¼ˆå‚è§tcsetattr()ï¼ŒTCSADRAINé€‰é¡¹ï¼‰ã€‚
+// ÔÚÉèÖÃÖÕ¶ËtermioµÄĞÅÏ¢Ö®Ç°£¬ĞèÒªÏÈµÈ´ıÊä³ö¶ÓÁĞÖĞËùÓĞÊı¾İ´¦ÀíÍê£¨ºÄ¾¡£©¡£¶ÔÓÚĞŞ¸Ä²ÎÊı»áÓ°ÏìÊä³öµÄÇé¿ö£¬¾ÍĞèÒª
+// Ê¹ÓÃÕâÖÖĞÎÊ½£¨²Î¼ûtcsetattr()£¬TCSADRAINÑ¡Ïî£©¡£
 #define TCSETAW		0x5407
-// åœ¨è®¾ç½®termioçš„ä¿¡æ¯ä¹‹å‰ï¼Œéœ€è¦å…ˆç­‰å¾…è¾“å‡ºé˜Ÿåˆ—ä¸­æ‰€æœ‰æ•°æ®å¤„ç†å®Œï¼Œå¹¶ä¸”åˆ·æ–°ï¼ˆæ¸…ç©ºï¼‰è¾“å…¥é˜Ÿåˆ—ï¼Œå†è®¾ç½®ï¼ˆå‚è§tcsetattr(),
-// TCSAFLUSHé€‰é¡¹ï¼‰ã€‚
+// ÔÚÉèÖÃtermioµÄĞÅÏ¢Ö®Ç°£¬ĞèÒªÏÈµÈ´ıÊä³ö¶ÓÁĞÖĞËùÓĞÊı¾İ´¦ÀíÍê£¬²¢ÇÒË¢ĞÂ£¨Çå¿Õ£©ÊäÈë¶ÓÁĞ£¬ÔÙÉèÖÃ£¨²Î¼ûtcsetattr(),
+// TCSAFLUSHÑ¡Ïî£©¡£
 #define TCSETAF		0x5408
-// ç­‰å¾…è¾“å‡ºé˜Ÿåˆ—å¤„ç†å®Œæ¯•ï¼ˆç©ºï¼‰ï¼Œè‹¥å‚æ•°å€¼æ˜¯0,åˆ™å‘é€ä¸€ä¸ªbreakï¼ˆå‚è§tcsendbreak()ï¼Œtcdrain()ï¼‰ã€‚
+// µÈ´ıÊä³ö¶ÓÁĞ´¦ÀíÍê±Ï£¨¿Õ£©£¬Èô²ÎÊıÖµÊÇ0,Ôò·¢ËÍÒ»¸öbreak£¨²Î¼ûtcsendbreak()£¬tcdrain()£©¡£
 #define TCSBRK		0x5409
-// å¼€å§‹/åœæ­¢æ§åˆ¶ã€‚å¦‚æœå‚æ•°å€¼æ˜¯0,åˆ™æŒ‚èµ·è¾“å‡ºï¼›å¦‚æœæ˜¯1,åˆ™é‡æ–°å¼€å¯æŒ‚èµ·çš„è¾“å‡ºï¼›å¦‚æœæ˜¯2,åˆ™æŒ‚èµ·è¾“å…¥ï¼›å¦‚æœæ˜¯3,åˆ™é‡æ–°å¼€å¯æŒ‚
-// èµ·çš„è¾“å…¥ï¼ˆå‚è§tcflow()ï¼‰ã€‚
+// ¿ªÊ¼/Í£Ö¹¿ØÖÆ¡£Èç¹û²ÎÊıÖµÊÇ0,Ôò¹ÒÆğÊä³ö£»Èç¹ûÊÇ1,ÔòÖØĞÂ¿ªÆô¹ÒÆğµÄÊä³ö£»Èç¹ûÊÇ2,Ôò¹ÒÆğÊäÈë£»Èç¹ûÊÇ3,ÔòÖØĞÂ¿ªÆô¹Ò
+// ÆğµÄÊäÈë£¨²Î¼ûtcflow()£©¡£
 #define TCXONC		0x540A
-// åˆ·æ–°å·²å†™è¾“å‡ºä½†è¿˜æ²¡å‘é€æˆ–å·²æ”¶ä½†è¿˜æ²¡æœ‰è¯»æ•°æ®ã€‚å¦‚æœå‚æ•°æ˜¯0,åˆ™åˆ·æ–°ï¼ˆæ¸…ç©ºï¼‰è¾“å…¥é˜Ÿåˆ—ï¼›å¦‚æœæ˜¯1,åˆ™åˆ·æ–°è¾“å‡ºé˜Ÿåˆ—ï¼›å¦‚æœæ˜¯2,
-// åˆ™åˆ·æ–°è¾“å…¥å’Œè¾“å‡ºé˜Ÿåˆ—ï¼ˆå‚è§tcflush()ï¼‰ã€‚
+// Ë¢ĞÂÒÑĞ´Êä³öµ«»¹Ã»·¢ËÍ»òÒÑÊÕµ«»¹Ã»ÓĞ¶ÁÊı¾İ¡£Èç¹û²ÎÊıÊÇ0,ÔòË¢ĞÂ£¨Çå¿Õ£©ÊäÈë¶ÓÁĞ£»Èç¹ûÊÇ1,ÔòË¢ĞÂÊä³ö¶ÓÁĞ£»Èç¹ûÊÇ2,
+// ÔòË¢ĞÂÊäÈëºÍÊä³ö¶ÓÁĞ£¨²Î¼ûtcflush()£©¡£
 #define TCFLSH		0x540B
-// ä¸‹é¢åç§°TIOC[*]çš„å«ä¹‰æ˜¯ttyè¾“å…¥è¾“å‡ºæ§åˆ¶å‘½ä»¤ã€‚
-// è®¾ç½®ç»ˆç«¯ä¸²è¡Œçº¿è·¯ä¸“ç”¨æ¨¡å¼ã€‚
+// ÏÂÃæÃû³ÆTIOC[*]µÄº¬ÒåÊÇttyÊäÈëÊä³ö¿ØÖÆÃüÁî¡£
+// ÉèÖÃÖÕ¶Ë´®ĞĞÏßÂ·×¨ÓÃÄ£Ê½¡£
 #define TIOCEXCL	0x540C
-// å¤ä½ç»ˆç«¯ä¸²è¡Œçº¿è·¯ä¸“ç”¨æ¨¡å¼ã€‚
+// ¸´Î»ÖÕ¶Ë´®ĞĞÏßÂ·×¨ÓÃÄ£Ê½¡£
 #define TIOCNXCL	0x540D
-// è®¾ç½®ttyä¸ºæ§åˆ¶ç»ˆç«¯ã€‚ï¼ˆTIOCNOTTY - ç¦æ­¢ttyä¸ºæ§åˆ¶ç»ˆç«¯ï¼‰ã€‚
+// ÉèÖÃttyÎª¿ØÖÆÖÕ¶Ë¡££¨TIOCNOTTY - ½ûÖ¹ttyÎª¿ØÖÆÖÕ¶Ë£©¡£
 #define TIOCSCTTY	0x540E
-// è¯»å–æŒ‡å®šç»ˆç«¯è®¾å¤‡çš„ç»„idï¼Œå‚è§tcgetpgrp()ã€‚è¯¥å¸¸æ•°ç¬¦å·åç§°æ˜¯â€œTerminal IO Control Get PGRPâ€çš„ç¼©å†™ã€‚è¯»å–å‰å°è¿›ç¨‹
-// ç»„IDã€‚
+// ¶ÁÈ¡Ö¸¶¨ÖÕ¶ËÉè±¸µÄ×éid£¬²Î¼ûtcgetpgrp()¡£¸Ã³£Êı·ûºÅÃû³ÆÊÇ¡°Terminal IO Control Get PGRP¡±µÄËõĞ´¡£¶ÁÈ¡Ç°Ì¨½ø³Ì
+// ×éID¡£
 #define TIOCGPGRP	0x540F
-// è®¾ç½®æŒ‡å®šç»ˆç«¯è®¾å¤‡è¿›ç¨‹çš„ç»„idï¼ˆå‚è§tcsetpgrp()ï¼‰ã€‚
+// ÉèÖÃÖ¸¶¨ÖÕ¶ËÉè±¸½ø³ÌµÄ×éid£¨²Î¼ûtcsetpgrp()£©¡£
 #define TIOCSPGRP	0x5410
-// è¿”å›è¾“å‡ºé˜Ÿåˆ—ä¸­è¿˜æœªé€å‡ºçš„å­—ç¬¦æ•°ã€‚
+// ·µ»ØÊä³ö¶ÓÁĞÖĞ»¹Î´ËÍ³öµÄ×Ö·ûÊı¡£
 #define TIOCOUTQ	0x5411
-// æ¨¡æ‹Ÿç»ˆç«¯è¾“å…¥ã€‚è¯¥å‘½ä»¤ä»¥ä¸€ä¸ªæŒ‡å‘å­—ç¬¦çš„æŒ‡é’ˆä½œä¸ºå‚æ•°ï¼Œå¹¶å‡è£…è¯¥å­—ç¬¦æ˜¯åœ¨ç»ˆç«¯ä¸Šé”®å…¥çš„ã€‚ç”¨æˆ·å¿…é¡»åœ¨è¯¥æ§åˆ¶ç»ˆç«¯ä¸Šå…·æœ‰è¶…çº§ç”¨æˆ·æƒé™
-// æˆ–å…·æœ‰è¯»è®¸å¯æƒé™ã€‚
+// Ä£ÄâÖÕ¶ËÊäÈë¡£¸ÃÃüÁîÒÔÒ»¸öÖ¸Ïò×Ö·ûµÄÖ¸Õë×÷Îª²ÎÊı£¬²¢¼Ù×°¸Ã×Ö·ûÊÇÔÚÖÕ¶ËÉÏ¼üÈëµÄ¡£ÓÃ»§±ØĞëÔÚ¸Ã¿ØÖÆÖÕ¶ËÉÏ¾ßÓĞ³¬¼¶ÓÃ»§È¨ÏŞ
+// »ò¾ßÓĞ¶ÁĞí¿ÉÈ¨ÏŞ¡£
 #define TIOCSTI		0x5412
-// è¯»å–ç»ˆç«¯è®¾å¤‡çª—å£å¤§å°ä¿¡æ¯ï¼ˆå‚è§winsizeç»“æ„ï¼‰ã€‚
+// ¶ÁÈ¡ÖÕ¶ËÉè±¸´°¿Ú´óĞ¡ĞÅÏ¢£¨²Î¼ûwinsize½á¹¹£©¡£
 #define TIOCGWINSZ	0x5413
-// è®¾ç½®ç»ˆç«¯è®¾å¤‡çª—å£å¤§å°ä¿¡æ¯ï¼ˆå‚è§winsizeç»“æ„ï¼‰ã€‚
+// ÉèÖÃÖÕ¶ËÉè±¸´°¿Ú´óĞ¡ĞÅÏ¢£¨²Î¼ûwinsize½á¹¹£©¡£
 #define TIOCSWINSZ	0x5414
-// è¿”å›modemçŠ¶æ€æ§åˆ¶å¼•çº¿çš„å½“å‰çŠ¶æ€æ¯”ç‰¹ä½æ ‡å¿—é›†ã€‚
+// ·µ»Ømodem×´Ì¬¿ØÖÆÒıÏßµÄµ±Ç°×´Ì¬±ÈÌØÎ»±êÖ¾¼¯¡£
 #define TIOCMGET	0x5415
-// è®¾ç½®å•ä¸ªmodemçŠ¶æ€æ§åˆ¶å¼•çº¿çš„çŠ¶æ€ï¼ˆtrueæˆ–falseï¼‰ï¼ˆIndividual control line Setï¼‰ã€‚
+// ÉèÖÃµ¥¸ömodem×´Ì¬¿ØÖÆÒıÏßµÄ×´Ì¬£¨true»òfalse£©£¨Individual control line Set£©¡£
 #define TIOCMBIS	0x5416
-// å¤ä½å•ä¸ªmodemçŠ¶æ€æ§åˆ¶å¼•çº¿çš„çŠ¶æ€ï¼ˆIndividual control line clearï¼‰ã€‚
+// ¸´Î»µ¥¸ömodem×´Ì¬¿ØÖÆÒıÏßµÄ×´Ì¬£¨Individual control line clear£©¡£
 #define TIOCMBIC	0x5417
-// è®¾ç½®modemçŠ¶æ€å¼•çº¿çš„çŠ¶æ€ã€‚å¦‚æœæŸä¸€æ¯”ç‰¹ä½ç½®ä½ï¼Œåˆ™modemå¯¹åº”çš„çŠ¶æ€å¼•çº¿å°†ç½®ä¸ºæœ‰æ•ˆã€‚
+// ÉèÖÃmodem×´Ì¬ÒıÏßµÄ×´Ì¬¡£Èç¹ûÄ³Ò»±ÈÌØÎ»ÖÃÎ»£¬Ôòmodem¶ÔÓ¦µÄ×´Ì¬ÒıÏß½«ÖÃÎªÓĞĞ§¡£
 #define TIOCMSET	0x5418
-// è¯»å–è½¯ä»¶è½½æ³¢æ£€æµ‹æ ‡å¿—ï¼ˆ1 - å¼€å¯ï¼›0 - å…³é—­ï¼‰ã€‚
-// å¯¹äºæœ¬åœ°è¿æ¥çš„ç»ˆç«¯æˆ–å…¶ä»–è®¾ç½®ï¼Œè½¯ä»¶è½½æ³¢æ ‡å¿—æ˜¯å¼€å¯çš„ï¼Œå¯¹äºä½¿ç”¨modemçº¿è·¯çš„ç»ˆç«¯æˆ–è®¾å¤‡åˆ™æ˜¯å…³é—­çš„ã€‚ä¸ºäº†èƒ½ä½¿ç”¨è¿™ä¸¤ä¸ªioctlè°ƒç”¨ï¼Œ
-// ttyçº¿è·¯åº”è¯¥æ˜¯ä»¥O_NDELAYæ–¹å¼æ‰“å¼€çš„ï¼Œè¿™æ ·open()å°±ä¸ä¼šç­‰å¾…è½½æ³¢ã€‚
+// ¶ÁÈ¡Èí¼şÔØ²¨¼ì²â±êÖ¾£¨1 - ¿ªÆô£»0 - ¹Ø±Õ£©¡£
+// ¶ÔÓÚ±¾µØÁ¬½ÓµÄÖÕ¶Ë»òÆäËûÉèÖÃ£¬Èí¼şÔØ²¨±êÖ¾ÊÇ¿ªÆôµÄ£¬¶ÔÓÚÊ¹ÓÃmodemÏßÂ·µÄÖÕ¶Ë»òÉè±¸ÔòÊÇ¹Ø±ÕµÄ¡£ÎªÁËÄÜÊ¹ÓÃÕâÁ½¸öioctlµ÷ÓÃ£¬
+// ttyÏßÂ·Ó¦¸ÃÊÇÒÔO_NDELAY·½Ê½´ò¿ªµÄ£¬ÕâÑùopen()¾Í²»»áµÈ´ıÔØ²¨¡£
 #define TIOCGSOFTCAR	0x5419
-// è®¾ç½®è½¯ä»¶è½½æ³¢æ£€æµ‹æ ‡å¿—ï¼ˆ1 - å¼€å¯ï¼›0 - å…³é—­ï¼‰ã€‚
+// ÉèÖÃÈí¼şÔØ²¨¼ì²â±êÖ¾£¨1 - ¿ªÆô£»0 - ¹Ø±Õ£©¡£
 #define TIOCSSOFTCAR	0x541A
-// è¿”å›è¾“å…¥é˜Ÿåˆ—ä¸­è¿˜æœªå–èµ°å­—ç¬¦çš„æ•°ç›®ã€‚
+// ·µ»ØÊäÈë¶ÓÁĞÖĞ»¹Î´È¡×ß×Ö·ûµÄÊıÄ¿¡£
 #define FIONREAD	0x541B
 #define TIOCINQ		FIONREAD
 
-// çª—å£å¤§å°ï¼ˆWindow sizeï¼‰å±æ€§ç»“æ„ã€‚åœ¨çª—å£ç¯å¢ƒä¸­å¯ç”¨äºåŸºäºå±å¹•çš„åº”ç”¨ç¨‹åºã€‚
-// ioctlsä¸­çš„TIOCGWINSZå’ŒTIOCSWINSZå¯ç”¨æ¥è¯»å–æˆ–è®¾ç½®è¿™äº›ä¿¡æ¯ã€‚
+// ´°¿Ú´óĞ¡£¨Window size£©ÊôĞÔ½á¹¹¡£ÔÚ´°¿Ú»·¾³ÖĞ¿ÉÓÃÓÚ»ùÓÚÆÁÄ»µÄÓ¦ÓÃ³ÌĞò¡£
+// ioctlsÖĞµÄTIOCGWINSZºÍTIOCSWINSZ¿ÉÓÃÀ´¶ÁÈ¡»òÉèÖÃÕâĞ©ĞÅÏ¢¡£
 struct winsize {
-	unsigned short ws_row;          // çª—å£å­—ç¬¦è¡Œæ•°ã€‚
-	unsigned short ws_col;          // çª—å£å­—ç¬¦åˆ—æ•°ã€‚
-	unsigned short ws_xpixel;       // çª—å£å®½åº¦ï¼Œåƒç´ å€¼ã€‚
-	unsigned short ws_ypixel;       // çª—å£é«˜åº¦ï¼Œåƒç´ å€¼ã€‚
+	unsigned short ws_row;          // ´°¿Ú×Ö·ûĞĞÊı¡£
+	unsigned short ws_col;          // ´°¿Ú×Ö·ûÁĞÊı¡£
+	unsigned short ws_xpixel;       // ´°¿Ú¿í¶È£¬ÏñËØÖµ¡£
+	unsigned short ws_ypixel;       // ´°¿Ú¸ß¶È£¬ÏñËØÖµ¡£
 };
 
-// AT&Tç³»ç»ŸVçš„termioç»“æ„ã€‚
-#define NCC 8                           // termioç»“æ„ä¸­æ§åˆ¶å­—ç¬¦æ•°ç»„çš„é•¿åº¦ã€‚
+// AT&TÏµÍ³VµÄtermio½á¹¹¡£
+#define NCC 8                           // termio½á¹¹ÖĞ¿ØÖÆ×Ö·ûÊı×éµÄ³¤¶È¡£
 struct termio {
-	unsigned short c_iflag;		/* input mode flags */   // è¾“å…¥æ¨¡å¼æ ‡å¿—ã€‚
-	unsigned short c_oflag;		/* output mode flags */  // è¾“å‡ºæ¨¡å¼æ ‡å¿—ã€‚
-	unsigned short c_cflag;		/* control mode flags */ // æ§åˆ¶æ¨¡å¼æ ‡å¿—ã€‚
-	unsigned short c_lflag;		/* local mode flags */   // æœ¬åœ°æ¨¡å¼æ ‡å¿—ã€‚
-	unsigned char c_line;		/* line discipline */    // çº¿è·¯è§„ç¨‹ï¼ˆé€Ÿç‡ï¼‰ã€‚
-	unsigned char c_cc[NCC];	/* control characters */ // æ§åˆ¶å­—ç¬¦æ•°ç»„ã€‚
+	unsigned short c_iflag;		/* input mode flags */   // ÊäÈëÄ£Ê½±êÖ¾¡£
+	unsigned short c_oflag;		/* output mode flags */  // Êä³öÄ£Ê½±êÖ¾¡£
+	unsigned short c_cflag;		/* control mode flags */ // ¿ØÖÆÄ£Ê½±êÖ¾¡£
+	unsigned short c_lflag;		/* local mode flags */   // ±¾µØÄ£Ê½±êÖ¾¡£
+	unsigned char c_line;		/* line discipline */    // ÏßÂ·¹æ³Ì£¨ËÙÂÊ£©¡£
+	unsigned char c_cc[NCC];	/* control characters */ // ¿ØÖÆ×Ö·ûÊı×é¡£
 };
 
-// POSIXçš„termiosç»“æ„
-#define NCCS 17		// termiosç»“æ„ä¸­æ§åˆ¶å­—ç¬¦æ•°ç»„é•¿åº¦.
+// POSIXµÄtermios½á¹¹
+#define NCCS 17		// termios½á¹¹ÖĞ¿ØÖÆ×Ö·ûÊı×é³¤¶È.
 struct termios {
-	tcflag_t c_iflag;		/* input mode flags */	// è¾“å…¥æ¨¡å¼æ ‡å¿—
-	tcflag_t c_oflag;		/* output mode flags */	// è¾“å‡ºæ¨¡å¼æ ‡å¿—
-	tcflag_t c_cflag;		/* control mode flags */	// æ§åˆ¶æ¨¡å¼æ ‡å¿—.
-	tcflag_t c_lflag;		/* local mode flags */		// æœ¬åœ°æ¨¡å¼æ ‡å¿—.
-	cc_t c_line;			/* line discipline */		// çº¿è·¯è§„ç¨‹(é€Ÿç‡).
-	cc_t c_cc[NCCS];		/* control characters */	// æ§åˆ¶å­—ç¬¦æ•°ç»„.
+	tcflag_t c_iflag;		/* input mode flags */	// ÊäÈëÄ£Ê½±êÖ¾
+	tcflag_t c_oflag;		/* output mode flags */	// Êä³öÄ£Ê½±êÖ¾
+	tcflag_t c_cflag;		/* control mode flags */	// ¿ØÖÆÄ£Ê½±êÖ¾.
+	tcflag_t c_lflag;		/* local mode flags */		// ±¾µØÄ£Ê½±êÖ¾.
+	cc_t c_line;			/* line discipline */		// ÏßÂ·¹æ³Ì(ËÙÂÊ).
+	cc_t c_cc[NCCS];		/* control characters */	// ¿ØÖÆ×Ö·ûÊı×é.
 };
 
-// ä»¥ä¸‹æ˜¯æ§åˆ¶å­—ç¬¦æ•°ç»„c_cc[]ä¸­é¡¹çš„ç´¢å¼•å€¼.è¯¥æ•°ç»„åˆå§‹å®šä¹‰åœ¨include/linux/tty.hä¸­.ç¨‹åºå¯ä»¥æ›´æ”¹è¿™ä¸ªæ•°ç»„ä¸­çš„å€¼.å¦‚æœå®šä¹‰äº†_POSIX_VDISABLE(\0)
-// é‚£ä¹ˆå½“æ•°ç»„æŸä¸€é¡¹å€¼ç­‰äº_POSIX_VDISABLEçš„å€¼æ—¶,è¡¨ç¤ºç¦æ­¢ä½¿ç”¨æ•°ç»„ä¸­ç›¸åº”çš„ç‰¹æ®Šå­—ç¬¦.
-/* c_cc characters */	/* c_ccæ•°ç»„ä¸­çš„å­—ç¬¦ */
-#define VINTR 0		// c_cc[VINTR] = INTR	(^C),\003,ä¸­æ–­å­—ç¬¦.
-#define VQUIT 1		// c_cc[VQUIT] = QUIT	(^\),\034,é€€å‡ºå­—ç¬¦.
-#define VERASE 2	// c_cc[VERASE] = ERASE	(^H),\177,æ“¦é™¤å­—ç¬¦.
-#define VKILL 3		// c_cc[VKILL] = KILL	(^U),\025,ç»ˆæ­¢å­—ç¬¦(åˆ é™¤è¡Œ).
-#define VEOF 4		// c_cc[VEOF] = EOF	(^D),\004,æ–‡ä»¶ç»“æŸå­—ç¬¦.
-#define VTIME 5		// c_cc[VTIME] = TIME	(\0),\0,å®šæ—¶å™¨å€¼.
-#define VMIN 6		// c_cc[VMIN] = MIN	(\1),\1,å®šæ—¶å™¨å€¼.
-#define VSWTC 7		// c_cc[VSWTC] = SWTC	(\0),\0,äº¤æ¢å­—ç¬¦.
-#define VSTART 8	// c_cc[VSTART] = START	(^Q),\021,å¼€å§‹å­—ç¬¦.
-#define VSTOP 9		// c_cc[VSTOP] = STOP	(^S),\023,åœæ­¢å­—ç¬¦.
-#define VSUSP 10	// c_cc[VSUSP] = SUSP	(^Z),\032,æŒ‚èµ·å­—ç¬¦.
-#define VEOL 11		// c_cc[VEOL] = EOL	(\0),\0,è¡Œç»“æŸå­—ç¬¦.
-#define VREPRINT 12	// c_cc[VREPRINT] = REPRINT	(^$),\022,é‡æ˜¾ç¤ºå­—ç¬¦.
-#define VDISCARD 13	// c_cc[VDISCARD] = DISCARD	(^O),\017,ä¸¢å¼ƒå­—ç¬¦.
-#define VWERASE 14	// c_cc[VWERASE] = WERASE	(^W),\027,å•è¯æ“¦é™¤å­—ç¬¦.
-#define VLNEXT 15	// c_cc[VLNEXT] = LNEXT	(^V),\026,ä¸‹ä¸€è¡Œå­—ç¬¦.
-#define VEOL2 16	// c_cc[VEOL2] = EOL2	(\0),\0,è¡Œç»“æŸå­—ç¬¦2.
+// ÒÔÏÂÊÇ¿ØÖÆ×Ö·ûÊı×éc_cc[]ÖĞÏîµÄË÷ÒıÖµ.¸ÃÊı×é³õÊ¼¶¨ÒåÔÚinclude/linux/tty.hÖĞ.³ÌĞò¿ÉÒÔ¸ü¸ÄÕâ¸öÊı×éÖĞµÄÖµ.Èç¹û¶¨ÒåÁË_POSIX_VDISABLE(\0)
+// ÄÇÃ´µ±Êı×éÄ³Ò»ÏîÖµµÈÓÚ_POSIX_VDISABLEµÄÖµÊ±,±íÊ¾½ûÖ¹Ê¹ÓÃÊı×éÖĞÏàÓ¦µÄÌØÊâ×Ö·û.
+/* c_cc characters */	/* c_ccÊı×éÖĞµÄ×Ö·û */
+#define VINTR 0		// c_cc[VINTR] = INTR	(^C),\003,ÖĞ¶Ï×Ö·û.
+#define VQUIT 1		// c_cc[VQUIT] = QUIT	(^\),\034,ÍË³ö×Ö·û.
+#define VERASE 2	// c_cc[VERASE] = ERASE	(^H),\177,²Á³ı×Ö·û.
+#define VKILL 3		// c_cc[VKILL] = KILL	(^U),\025,ÖÕÖ¹×Ö·û(É¾³ıĞĞ).
+#define VEOF 4		// c_cc[VEOF] = EOF	(^D),\004,ÎÄ¼ş½áÊø×Ö·û.
+#define VTIME 5		// c_cc[VTIME] = TIME	(\0),\0,¶¨Ê±Æ÷Öµ.
+#define VMIN 6		// c_cc[VMIN] = MIN	(\1),\1,¶¨Ê±Æ÷Öµ.
+#define VSWTC 7		// c_cc[VSWTC] = SWTC	(\0),\0,½»»»×Ö·û.
+#define VSTART 8	// c_cc[VSTART] = START	(^Q),\021,¿ªÊ¼×Ö·û.
+#define VSTOP 9		// c_cc[VSTOP] = STOP	(^S),\023,Í£Ö¹×Ö·û.
+#define VSUSP 10	// c_cc[VSUSP] = SUSP	(^Z),\032,¹ÒÆğ×Ö·û.
+#define VEOL 11		// c_cc[VEOL] = EOL	(\0),\0,ĞĞ½áÊø×Ö·û.
+#define VREPRINT 12	// c_cc[VREPRINT] = REPRINT	(^$),\022,ÖØÏÔÊ¾×Ö·û.
+#define VDISCARD 13	// c_cc[VDISCARD] = DISCARD	(^O),\017,¶ªÆú×Ö·û.
+#define VWERASE 14	// c_cc[VWERASE] = WERASE	(^W),\027,µ¥´Ê²Á³ı×Ö·û.
+#define VLNEXT 15	// c_cc[VLNEXT] = LNEXT	(^V),\026,ÏÂÒ»ĞĞ×Ö·û.
+#define VEOL2 16	// c_cc[VEOL2] = EOL2	(\0),\0,ĞĞ½áÊø×Ö·û2.
 
-// termiosç»“æ„è¾“å…¥æ¨¡å¼å­—æ®µc_iflagå„ç§æ ‡å¿—çš„ç¬¦å·å¸¸æ•°.
-/* c_iflag bits */	/* c_iflagæ¯”ç‰¹ä½ */
-#define IGNBRK	0000001		// è¾“å…¥æ—¶å¿½ç•¥BREAKæ¡ä»¶
-#define BRKINT	0000002		// åœ¨BREAKæ—¶äº§ç”ŸSIGINTä¿¡å·
-#define IGNPAR	0000004		// å¿½ç•¥å¥‡å¶æ ¡éªŒå‡ºé”™çš„å­—ç¬¦
-#define PARMRK	0000010		// æ ‡è®°å¥‡å¶æ ¡éªŒé”™
-#define INPCK	0000020		// å…è®¸è¾“å…¥å¥‡å¶æ ¡éªŒ
-#define ISTRIP	0000040		// å±è”½å­—ç¬¦ç¬¬8ä½
-#define INLCR	0000100		// è¾“å…¥æ—¶å°†æ¢è¡Œç¬¦NLæ˜ å°„æˆå›è½¦ç¬¦CR
-#define IGNCR	0000200		// å¿½ç•¥å›è½¦ç¬¦CR
-#define ICRNL	0000400		// åœ¨è¾“å…¥æ—¶å°†å›è½¦ç¬¦æ˜ å°„æˆæ¢è¡Œç¬¦NL
-#define IUCLC	0001000		// åœ¨è¾“å…¥æ—¶å°†å¤§å†™å­—ç¬¦è½¬æ¢æˆå°å†™å­—ç¬¦
-#define IXON	0002000		// å…è®¸å¼€å§‹/åœæ­¢(XON/XOFF)è¾“å‡ºæ§åˆ¶
-#define IXANY	0004000		// å…è®¸ä»»ä½•å­—ç¬¦é‡å¯è¾“å‡º
-#define IXOFF	0010000		// å…è®¸å¼€å§‹/åœæ­¢(XON/XOFF)è¾“å…¥æ§åˆ¶
-#define IMAXBEL	0020000		// è¾“å…¥é˜Ÿåˆ—æ»¡æ—¶å“é“ƒ
+// termios½á¹¹ÊäÈëÄ£Ê½×Ö¶Îc_iflag¸÷ÖÖ±êÖ¾µÄ·ûºÅ³£Êı.
+/* c_iflag bits */	/* c_iflag±ÈÌØÎ» */
+#define IGNBRK	0000001		// ÊäÈëÊ±ºöÂÔBREAKÌõ¼ş
+#define BRKINT	0000002		// ÔÚBREAKÊ±²úÉúSIGINTĞÅºÅ
+#define IGNPAR	0000004		// ºöÂÔÆæÅ¼Ğ£Ñé³ö´íµÄ×Ö·û
+#define PARMRK	0000010		// ±ê¼ÇÆæÅ¼Ğ£Ñé´í
+#define INPCK	0000020		// ÔÊĞíÊäÈëÆæÅ¼Ğ£Ñé
+#define ISTRIP	0000040		// ÆÁ±Î×Ö·ûµÚ8Î»
+#define INLCR	0000100		// ÊäÈëÊ±½«»»ĞĞ·ûNLÓ³Éä³É»Ø³µ·ûCR
+#define IGNCR	0000200		// ºöÂÔ»Ø³µ·ûCR
+#define ICRNL	0000400		// ÔÚÊäÈëÊ±½«»Ø³µ·ûÓ³Éä³É»»ĞĞ·ûNL
+#define IUCLC	0001000		// ÔÚÊäÈëÊ±½«´óĞ´×Ö·û×ª»»³ÉĞ¡Ğ´×Ö·û
+#define IXON	0002000		// ÔÊĞí¿ªÊ¼/Í£Ö¹(XON/XOFF)Êä³ö¿ØÖÆ
+#define IXANY	0004000		// ÔÊĞíÈÎºÎ×Ö·ûÖØÆôÊä³ö
+#define IXOFF	0010000		// ÔÊĞí¿ªÊ¼/Í£Ö¹(XON/XOFF)ÊäÈë¿ØÖÆ
+#define IMAXBEL	0020000		// ÊäÈë¶ÓÁĞÂúÊ±ÏìÁå
 
-// termiosç»“æ„ä¸­è¾“å‡ºæ¨¡å¼å­—æ®µc_olagå„ç§æ ‡å¿—çš„ç¬¦å·å¸¸æ•°.
-/* c_oflag bits */	/* c_oflagæ¯”ç‰¹ä½ */
-#define OPOST	0000001		// æ‰§è¡Œè¾“å‡ºå¤„ç†
-#define OLCUC	0000002		// åœ¨è¾“å‡ºæ—¶å°†å°å†™å­—ç¬¦è½¬æ¢æˆå¤§å†™å­—ç¬¦
-#define ONLCR	0000004		// åœ¨è¾“å‡ºæ—¶å°†æ¢è¡Œç¬¦NLæ˜ å°„æˆå›è½¦-æ¢è¡Œç¬¦CR-NL
-#define OCRNL	0000010		// åœ¨è¾“å‡ºæ—¶å°†å›è½¦ç¬¦CRæ˜ å°„æˆæ¢è¡Œç¬¦NL
-#define ONOCR	0000020		// åœ¨0åˆ—ä¸è¾“å‡ºå›è½¦ç¬¦CR
-#define ONLRET	0000040		// æ¢è¡Œç¬¦NLæ‰§è¡Œå›è½¦ç¬¦çš„åŠŸèƒ½
-#define OFILL	0000100		// å»¶è¿Ÿæ—¶ä½¿ç”¨å¡«å……å­—ç¬¦è€Œä¸ä½¿ç”¨æ—¶é—´å»¶è¿Ÿ
-#define OFDEL	0000200		// å¡«å……å­—ç¬¦æ˜¯ASCIIç DEL.å¦‚æœæœªè®¾ç½®,åˆ™ä½¿ç”¨ASCII NULL
-#define NLDLY	0000400		// é€‰æ‹©æ¢è¡Œå»¶è¿Ÿ
-#define   NL0	0000000		// æ¢è¡Œå»¶è¿Ÿç±»å‹0
-#define   NL1	0000400		// æ¢è¡Œå»¶è¿Ÿç±»å‹1
-#define CRDLY	0003000		// é€‰æ‹©å›è½¦å»¶è¿Ÿ
-#define   CR0	0000000		// å›è½¦å»¶è¿Ÿç±»å‹0
-#define   CR1	0001000		// å›è½¦å»¶è¿Ÿç±»å‹1
-#define   CR2	0002000		// å›è½¦å»¶è¿Ÿç±»å‹2
-#define   CR3	0003000		// å›è½¦å»¶è¿Ÿç±»å‹3
-#define TABDLY	0014000		// é€‰æ‹©æ°´å¹³åˆ¶è¡¨å»¶è¿Ÿ
-#define   TAB0	0000000		// æ°´å¹³åˆ¶è¡¨å»¶è¿Ÿç±»å‹0
-#define   TAB1	0004000		// æ°´å¹³åˆ¶è¡¨å»¶è¿Ÿç±»å‹1
-#define   TAB2	0010000		// æ°´å¹³åˆ¶è¡¨å»¶è¿Ÿç±»å‹2
-#define   TAB3	0014000		// æ°´å¹³åˆ¶è¡¨å»¶è¿Ÿç±»å‹3
-#define   XTABS	0014000		// å°†åˆ¶è¡¨ç¬¦TABæ¢æˆç©ºæ ¼,è¯¥å€¼è¡¨ç¤ºç©ºæ ¼æ•°
-#define BSDLY	0020000		// é€‰æ‹©é€€æ ¼å»¶è¿Ÿ
-#define   BS0	0000000		// é€€æ ¼å»¶è¿Ÿç±»å‹0
-#define   BS1	0020000		// é€€æ ¼å»¶è¿Ÿç±»å‹1
-#define VTDLY	0040000		// çºµå‘åˆ¶è¡¨å»¶è¿Ÿ
-#define   VT0	0000000		// çºµå‘åˆ¶è¡¨å»¶è¿Ÿç±»å‹0
-#define   VT1	0040000		// çºµå‘åˆ¶è¡¨å»¶è¿Ÿç±»å‹1
-#define FFDLY	0040000		// é€‰æ‹©æ¢é¡µå»¶è¿Ÿ
-#define   FF0	0000000		// æ¢é¡µå»¶è¿Ÿç±»å‹0
-#define   FF1	0040000		// æ¢é¡µå»¶è¿Ÿç±»å‹1
+// termios½á¹¹ÖĞÊä³öÄ£Ê½×Ö¶Îc_olag¸÷ÖÖ±êÖ¾µÄ·ûºÅ³£Êı.
+/* c_oflag bits */	/* c_oflag±ÈÌØÎ» */
+#define OPOST	0000001		// Ö´ĞĞÊä³ö´¦Àí
+#define OLCUC	0000002		// ÔÚÊä³öÊ±½«Ğ¡Ğ´×Ö·û×ª»»³É´óĞ´×Ö·û
+#define ONLCR	0000004		// ÔÚÊä³öÊ±½«»»ĞĞ·ûNLÓ³Éä³É»Ø³µ-»»ĞĞ·ûCR-NL
+#define OCRNL	0000010		// ÔÚÊä³öÊ±½«»Ø³µ·ûCRÓ³Éä³É»»ĞĞ·ûNL
+#define ONOCR	0000020		// ÔÚ0ÁĞ²»Êä³ö»Ø³µ·ûCR
+#define ONLRET	0000040		// »»ĞĞ·ûNLÖ´ĞĞ»Ø³µ·ûµÄ¹¦ÄÜ
+#define OFILL	0000100		// ÑÓ³ÙÊ±Ê¹ÓÃÌî³ä×Ö·û¶ø²»Ê¹ÓÃÊ±¼äÑÓ³Ù
+#define OFDEL	0000200		// Ìî³ä×Ö·ûÊÇASCIIÂëDEL.Èç¹ûÎ´ÉèÖÃ,ÔòÊ¹ÓÃASCII NULL
+#define NLDLY	0000400		// Ñ¡Ôñ»»ĞĞÑÓ³Ù
+#define   NL0	0000000		// »»ĞĞÑÓ³ÙÀàĞÍ0
+#define   NL1	0000400		// »»ĞĞÑÓ³ÙÀàĞÍ1
+#define CRDLY	0003000		// Ñ¡Ôñ»Ø³µÑÓ³Ù
+#define   CR0	0000000		// »Ø³µÑÓ³ÙÀàĞÍ0
+#define   CR1	0001000		// »Ø³µÑÓ³ÙÀàĞÍ1
+#define   CR2	0002000		// »Ø³µÑÓ³ÙÀàĞÍ2
+#define   CR3	0003000		// »Ø³µÑÓ³ÙÀàĞÍ3
+#define TABDLY	0014000		// Ñ¡ÔñË®Æ½ÖÆ±íÑÓ³Ù
+#define   TAB0	0000000		// Ë®Æ½ÖÆ±íÑÓ³ÙÀàĞÍ0
+#define   TAB1	0004000		// Ë®Æ½ÖÆ±íÑÓ³ÙÀàĞÍ1
+#define   TAB2	0010000		// Ë®Æ½ÖÆ±íÑÓ³ÙÀàĞÍ2
+#define   TAB3	0014000		// Ë®Æ½ÖÆ±íÑÓ³ÙÀàĞÍ3
+#define   XTABS	0014000		// ½«ÖÆ±í·ûTAB»»³É¿Õ¸ñ,¸ÃÖµ±íÊ¾¿Õ¸ñÊı
+#define BSDLY	0020000		// Ñ¡ÔñÍË¸ñÑÓ³Ù
+#define   BS0	0000000		// ÍË¸ñÑÓ³ÙÀàĞÍ0
+#define   BS1	0020000		// ÍË¸ñÑÓ³ÙÀàĞÍ1
+#define VTDLY	0040000		// ×İÏòÖÆ±íÑÓ³Ù
+#define   VT0	0000000		// ×İÏòÖÆ±íÑÓ³ÙÀàĞÍ0
+#define   VT1	0040000		// ×İÏòÖÆ±íÑÓ³ÙÀàĞÍ1
+#define FFDLY	0040000		// Ñ¡Ôñ»»Ò³ÑÓ³Ù
+#define   FF0	0000000		// »»Ò³ÑÓ³ÙÀàĞÍ0
+#define   FF1	0040000		// »»Ò³ÑÓ³ÙÀàĞÍ1
 
-// termiosç»“æ„ä¸­æ§åˆ¶æ¨¡å¼æ ‡å¿—å­—æ®µc_cflagæ ‡å¿—çš„ç¬¦å·å¸¸æ•°(8è¿›åˆ¶æ•°).
-/* c_cflag bit meaning */	/* c_cflagä½çš„å«ä¹‰ */
-#define CBAUD	0000017		// ä¼ è¾“é€Ÿç‡ä½å±è”½ç 
-#define  B0		0000000		/* hang up */	/* æŒ‚æ–­çº¿è·¯ */
-#define  B50	0000001		// æ³¢ç‰¹ç‡ 50
-#define  B75	0000002		// æ³¢ç‰¹ç‡ 75
-#define  B110	0000003		// æ³¢ç‰¹ç‡ 110
-#define  B134	0000004		// æ³¢ç‰¹ç‡ 134
-#define  B150	0000005		// æ³¢ç‰¹ç‡ 150
-#define  B200	0000006		// æ³¢ç‰¹ç‡ 200
-#define  B300	0000007		// æ³¢ç‰¹ç‡ 300
-#define  B600	0000010		// æ³¢ç‰¹ç‡ 600
-#define  B1200	0000011		// æ³¢ç‰¹ç‡ 1200
-#define  B1800	0000012		// æ³¢ç‰¹ç‡ 1800
-#define  B2400	0000013		// æ³¢ç‰¹ç‡ 2400
-#define  B4800	0000014		// æ³¢ç‰¹ç‡ 4800
-#define  B9600	0000015		// æ³¢ç‰¹ç‡ 9600
-#define  B19200	0000016		// æ³¢ç‰¹ç‡ 19200
-#define  B38400	0000017		// æ³¢ç‰¹ç‡ 38400
-#define  EXTA B19200		// æ‰©å±•æ³¢ç‰¹ç‡A
-#define  EXTB B38400		// æ‰©å±•æ³¢ç‰©ç‡B
-#define CSIZE	0000060		// å­—ç¬¦ä½å®½åº¦å±è”½ç 
-#define   CS5	0000000		// æ¯å­—ç¬¦5ä½
-#define   CS6	0000020		// æ¯å­—ç¬¦6ä½
-#define   CS7	0000040		// æ¯å­—ç¬¦7ä½
-#define   CS8	0000060		// æ¯å­—ç¬¦8ä½
-#define CSTOPB	0000100		// è®¾ç½®ä¸¤ä¸ªåœæ­¢ä½,è€Œä¸æ˜¯1ä¸ª
-#define CREAD	0000200		// å…è®¸æ¥æ”¶
-#define PARENB	0000400		// å¼€å¯è¾“å‡ºæ—¶äº§ç”Ÿå¥‡å¶ä½,è¾“å…¥æ—¶è¿›è¡Œå¥‡å¶æ ¡éªŒ
-#define PARODD	0001000		// è¾“å…¥/è¾“å‡ºæ ¡éªŒæ˜¯å¥‡æ ¡éªŒ
-#define HUPCL	0002000		// æœ€åè¿›ç¨‹å…³é—­æŒ‚æ–­
-#define CLOCAL	0004000		// å¿½ç•¥è°ƒåˆ¶è§£è°ƒå™¨(modem)æ§åˆ¶çº¿è·¯
-#define CIBAUD	03600000		/* input baud rate (not used) */	/* è¾“å…¥æ³¢ç‰¹ç‡(æœªä½¿ç”¨) */
-#define CRTSCTS	020000000000		/* flow control */	/* æµæ§åˆ¶ */
+// termios½á¹¹ÖĞ¿ØÖÆÄ£Ê½±êÖ¾×Ö¶Îc_cflag±êÖ¾µÄ·ûºÅ³£Êı(8½øÖÆÊı).
+/* c_cflag bit meaning */	/* c_cflagÎ»µÄº¬Òå */
+#define CBAUD	0000017		// ´«ÊäËÙÂÊÎ»ÆÁ±ÎÂë
+#define  B0		0000000		/* hang up */	/* ¹Ò¶ÏÏßÂ· */
+#define  B50	0000001		// ²¨ÌØÂÊ 50
+#define  B75	0000002		// ²¨ÌØÂÊ 75
+#define  B110	0000003		// ²¨ÌØÂÊ 110
+#define  B134	0000004		// ²¨ÌØÂÊ 134
+#define  B150	0000005		// ²¨ÌØÂÊ 150
+#define  B200	0000006		// ²¨ÌØÂÊ 200
+#define  B300	0000007		// ²¨ÌØÂÊ 300
+#define  B600	0000010		// ²¨ÌØÂÊ 600
+#define  B1200	0000011		// ²¨ÌØÂÊ 1200
+#define  B1800	0000012		// ²¨ÌØÂÊ 1800
+#define  B2400	0000013		// ²¨ÌØÂÊ 2400
+#define  B4800	0000014		// ²¨ÌØÂÊ 4800
+#define  B9600	0000015		// ²¨ÌØÂÊ 9600
+#define  B19200	0000016		// ²¨ÌØÂÊ 19200
+#define  B38400	0000017		// ²¨ÌØÂÊ 38400
+#define  EXTA B19200		// À©Õ¹²¨ÌØÂÊA
+#define  EXTB B38400		// À©Õ¹²¨ÎïÂÊB
+#define CSIZE	0000060		// ×Ö·ûÎ»¿í¶ÈÆÁ±ÎÂë
+#define   CS5	0000000		// Ã¿×Ö·û5Î»
+#define   CS6	0000020		// Ã¿×Ö·û6Î»
+#define   CS7	0000040		// Ã¿×Ö·û7Î»
+#define   CS8	0000060		// Ã¿×Ö·û8Î»
+#define CSTOPB	0000100		// ÉèÖÃÁ½¸öÍ£Ö¹Î»,¶ø²»ÊÇ1¸ö
+#define CREAD	0000200		// ÔÊĞí½ÓÊÕ
+#define PARENB	0000400		// ¿ªÆôÊä³öÊ±²úÉúÆæÅ¼Î»,ÊäÈëÊ±½øĞĞÆæÅ¼Ğ£Ñé
+#define PARODD	0001000		// ÊäÈë/Êä³öĞ£ÑéÊÇÆæĞ£Ñé
+#define HUPCL	0002000		// ×îºó½ø³Ì¹Ø±Õ¹Ò¶Ï
+#define CLOCAL	0004000		// ºöÂÔµ÷ÖÆ½âµ÷Æ÷(modem)¿ØÖÆÏßÂ·
+#define CIBAUD	03600000		/* input baud rate (not used) */	/* ÊäÈë²¨ÌØÂÊ(Î´Ê¹ÓÃ) */
+#define CRTSCTS	020000000000		/* flow control */	/* Á÷¿ØÖÆ */
 
-// termiosç»“æ„ä¸­æœ¬åœ°æ¨¡å¼æ ‡å¿—å­—æ®µc_lflagçš„ç¬¦å·å¸¸æ•°.
-/* c_lflag bits */	/* c_lflagä½ */
-#define ISIG	0000001		// å½“æ”¶åˆ°å­—ç¬¦INTR,QUIT,SUSPæˆ–DSUSP,äº§ç”Ÿç›¸åº”çš„ä¿¡å·
-#define ICANON	0000002		// å¼€å¯è§„èŒƒæ¨¡å¼(ç†Ÿæ¨¡å¼)
-#define XCASE	0000004		// è‹¥è®¾ç½®äº†ICANON,åˆ™ç»ˆç«¯æ˜¯å¤§å†™å­—ç¬¦çš„
-#define ECHO	0000010		// å›æ˜¾è¾“å…¥å­—ç¬¦
-#define ECHOE	0000020		// è‹¥è®¾ç½®äº†ICANON,åˆ™ERASE/WERASEå°†æ“¦é™¤å‰ä¸€å­—ç¬¦/å•è¯
-#define ECHOK	0000040		// è‹¥è®¾ç½®äº†ICANON,åˆ™KILLå­—ç¬¦å°†æ“¦é™¤å½“å‰è¡Œ
-#define ECHONL	0000100		// è‹¥è®¾ç½®äº†ICANON,åˆ™å³ä½¿ECHOæ²¡æœ‰å¼€å¯ä¹Ÿå›æ˜¾NLå­—ç¬¦
-#define NOFLSH	0000200		// å½“ç”ŸæˆSIGINTå’ŒSIGOUITä¿¡å·æ—¶ä¸åˆ·æ–°è¾“å…¥è¾“å‡ºé˜Ÿåˆ—,å½“ç”ŸæˆSIGSUSPä¿¡å·æ—¶,åˆ·æ–°è¾“å…¥é˜Ÿåˆ—
-#define TOSTOP	0000400		// å‘é€SIGTTOUä¿¡å·åˆ°åå°è¿›ç¨‹çš„è¿›ç¨‹ç»„,è¯¥åå°è¿›ç¨‹è¯•å›¾å†™è‡ªå·±çš„æ§åˆ¶ç»ˆç«¯.
-#define ECHOCTL	0001000		// è‹¥è®¾ç½®äº†ECHO,åˆ™é™¤TAB,NL,STARTå’ŒSTOPä»¥å¤–çš„ASCIIæ§åˆ¶ä¿¡å·å°†è¢«å›æ˜¾æˆåƒ^Xå¼æ ·,Xå€¼æ˜¯æ§åˆ¶ç¬¦+0x40
-#define ECHOPRT	0002000		// è‹¥è®¾ç½®äº†ICANONå’ŒIECHO,åˆ™å­—ç¬¦åœ¨æ“¦é™¤æ—¶å°†æ˜¾ç¤º
-#define ECHOKE	0004000		// è‹¥è®¾ç½®äº†ICANON,åˆ™KILLé€šè¿‡æ“¦é™¤è¡Œä¸Šçš„æ‰€æœ‰å­—ç¬¦è¢«å›æ˜¾
-#define FLUSHO	0010000		// è¾“å‡ºè¢«åˆ·æ–°.é€šè¿‡é”®å…¥DISCARDå­—ç¬¦,è¯¥æ ‡å¿—è¢«ç¿»è½¬
-#define PENDIN	0040000		// å½“ä¸‹ä¸€ä¸ªå­—ç¬¦æ˜¯è¯»æ—¶,è¾“å…¥é˜Ÿåˆ—ä¸­çš„æ‰€æœ‰å­—ç¬¦å°†è¢«é‡æ˜¾
-#define IEXTEN	0100000		// å¼€å¯å®ç°æ—¶å®šä¹‰çš„è¾“å…¥å¤„ç†
+// termios½á¹¹ÖĞ±¾µØÄ£Ê½±êÖ¾×Ö¶Îc_lflagµÄ·ûºÅ³£Êı.
+/* c_lflag bits */	/* c_lflagÎ» */
+#define ISIG	0000001		// µ±ÊÕµ½×Ö·ûINTR,QUIT,SUSP»òDSUSP,²úÉúÏàÓ¦µÄĞÅºÅ
+#define ICANON	0000002		// ¿ªÆô¹æ·¶Ä£Ê½(ÊìÄ£Ê½)
+#define XCASE	0000004		// ÈôÉèÖÃÁËICANON,ÔòÖÕ¶ËÊÇ´óĞ´×Ö·ûµÄ
+#define ECHO	0000010		// »ØÏÔÊäÈë×Ö·û
+#define ECHOE	0000020		// ÈôÉèÖÃÁËICANON,ÔòERASE/WERASE½«²Á³ıÇ°Ò»×Ö·û/µ¥´Ê
+#define ECHOK	0000040		// ÈôÉèÖÃÁËICANON,ÔòKILL×Ö·û½«²Á³ıµ±Ç°ĞĞ
+#define ECHONL	0000100		// ÈôÉèÖÃÁËICANON,Ôò¼´Ê¹ECHOÃ»ÓĞ¿ªÆôÒ²»ØÏÔNL×Ö·û
+#define NOFLSH	0000200		// µ±Éú³ÉSIGINTºÍSIGOUITĞÅºÅÊ±²»Ë¢ĞÂÊäÈëÊä³ö¶ÓÁĞ,µ±Éú³ÉSIGSUSPĞÅºÅÊ±,Ë¢ĞÂÊäÈë¶ÓÁĞ
+#define TOSTOP	0000400		// ·¢ËÍSIGTTOUĞÅºÅµ½ºóÌ¨½ø³ÌµÄ½ø³Ì×é,¸ÃºóÌ¨½ø³ÌÊÔÍ¼Ğ´×Ô¼ºµÄ¿ØÖÆÖÕ¶Ë.
+#define ECHOCTL	0001000		// ÈôÉèÖÃÁËECHO,Ôò³ıTAB,NL,STARTºÍSTOPÒÔÍâµÄASCII¿ØÖÆĞÅºÅ½«±»»ØÏÔ³ÉÏñ^XÊ½Ñù,XÖµÊÇ¿ØÖÆ·û+0x40
+#define ECHOPRT	0002000		// ÈôÉèÖÃÁËICANONºÍIECHO,Ôò×Ö·ûÔÚ²Á³ıÊ±½«ÏÔÊ¾
+#define ECHOKE	0004000		// ÈôÉèÖÃÁËICANON,ÔòKILLÍ¨¹ı²Á³ıĞĞÉÏµÄËùÓĞ×Ö·û±»»ØÏÔ
+#define FLUSHO	0010000		// Êä³ö±»Ë¢ĞÂ.Í¨¹ı¼üÈëDISCARD×Ö·û,¸Ã±êÖ¾±»·­×ª
+#define PENDIN	0040000		// µ±ÏÂÒ»¸ö×Ö·ûÊÇ¶ÁÊ±,ÊäÈë¶ÓÁĞÖĞµÄËùÓĞ×Ö·û½«±»ÖØÏÔ
+#define IEXTEN	0100000		// ¿ªÆôÊµÏÖÊ±¶¨ÒåµÄÊäÈë´¦Àí
 
-/* modem lines */       /* modemçº¿è·¯ä¿¡å·ç¬¦å·å¸¸æ•° */
-#define TIOCM_LE	0x001           // çº¿è·¯å…è®¸ï¼ˆLine Enableï¼‰ã€‚
-#define TIOCM_DTR	0x002           // æ•°æ®ç»ˆç«¯å°±ç»ªï¼ˆData erminal readyï¼‰ã€‚
-#define TIOCM_RTS	0x004           // è¯·æ±‚å‘é€ï¼ˆRequest to Sendï¼‰ã€‚
-#define TIOCM_ST	0x008           // ä¸²è¡Œæ•°æ®å‘é€ï¼ˆSerial transferï¼‰ã€‚
-#define TIOCM_SR	0x010           // ä¸²è¡Œæ•°æ®æ¥æ”¶ï¼ˆSerial Receiveï¼‰ã€‚
-#define TIOCM_CTS	0x020           // æ¸…é™¤å‘é€ï¼ˆClear To Sendï¼‰ã€‚
-#define TIOCM_CAR	0x040           // è½½æ³¢ç›‘æµ‹ï¼ˆCarrier Detectï¼‰ã€‚
-#define TIOCM_RNG	0x080           // å“é“ƒæŒ‡ç¤ºï¼ˆRing indicateï¼‰ã€‚
-#define TIOCM_DSR	0x100           // æ•°æ®è®¾å¤‡å°±ç»ªï¼ˆData Set Readyï¼‰ã€‚
+/* modem lines */       /* modemÏßÂ·ĞÅºÅ·ûºÅ³£Êı */
+#define TIOCM_LE	0x001           // ÏßÂ·ÔÊĞí£¨Line Enable£©¡£
+#define TIOCM_DTR	0x002           // Êı¾İÖÕ¶Ë¾ÍĞ÷£¨Data erminal ready£©¡£
+#define TIOCM_RTS	0x004           // ÇëÇó·¢ËÍ£¨Request to Send£©¡£
+#define TIOCM_ST	0x008           // ´®ĞĞÊı¾İ·¢ËÍ£¨Serial transfer£©¡£
+#define TIOCM_SR	0x010           // ´®ĞĞÊı¾İ½ÓÊÕ£¨Serial Receive£©¡£
+#define TIOCM_CTS	0x020           // Çå³ı·¢ËÍ£¨Clear To Send£©¡£
+#define TIOCM_CAR	0x040           // ÔØ²¨¼à²â£¨Carrier Detect£©¡£
+#define TIOCM_RNG	0x080           // ÏìÁåÖ¸Ê¾£¨Ring indicate£©¡£
+#define TIOCM_DSR	0x100           // Êı¾İÉè±¸¾ÍĞ÷£¨Data Set Ready£©¡£
 #define TIOCM_CD	TIOCM_CAR
 #define TIOCM_RI	TIOCM_RNG
 
-/* tcflow() and TCXONC use these */     /* tcflow()å’ŒTCXONCä½¿ç”¨è¿™äº›ç¬¦å· */
-#define	TCOOFF		0       // æŒ‚èµ·è¾“å‡ºï¼ˆæ˜¯â€œTerminal Control Output OFFâ€çš„ç¼©å†™ï¼‰ã€‚
-#define	TCOON		1       // é‡å¯è¢«æŒ‚èµ·çš„è¾“å‡ºã€‚
-#define	TCIOFF		2       // ç³»ç»Ÿä¼ è¾“ä¸€ä¸ªSTOPå­—ç¬¦ï¼Œä½¿è®¾å¤‡åœæ­¢å‘ç³»ç»Ÿä¼ è¾“æ•°æ®ã€‚
-#define	TCION		3       // ç³»ç»Ÿä¼ è¾“ä¸€ä¸ªSTARTå­—ç¬¦ï¼Œä½¿è®¾å¤‡å¼€å§‹é«˜ç³»ç»Ÿä¼ è¾“æ•°æ®ã€‚
+/* tcflow() and TCXONC use these */     /* tcflow()ºÍTCXONCÊ¹ÓÃÕâĞ©·ûºÅ */
+#define	TCOOFF		0       // ¹ÒÆğÊä³ö£¨ÊÇ¡°Terminal Control Output OFF¡±µÄËõĞ´£©¡£
+#define	TCOON		1       // ÖØÆô±»¹ÒÆğµÄÊä³ö¡£
+#define	TCIOFF		2       // ÏµÍ³´«ÊäÒ»¸öSTOP×Ö·û£¬Ê¹Éè±¸Í£Ö¹ÏòÏµÍ³´«ÊäÊı¾İ¡£
+#define	TCION		3       // ÏµÍ³´«ÊäÒ»¸öSTART×Ö·û£¬Ê¹Éè±¸¿ªÊ¼¸ßÏµÍ³´«ÊäÊı¾İ¡£
 
-/* tcflush() and TCFLSH use these */    /* tcflush()å’ŒTCFLSHä½¿ç”¨è¿™äº›ç¬¦å·å¸¸æ•° */
-#define	TCIFLUSH	0       // æ¸…æ¥æ”¶åˆ°çš„æ•°æ®ä½†ä¸è¯»ã€‚
-#define	TCOFLUSH	1       // æ¸…å·²å†™çš„æ•°æ®ä½†ä¸ä¼ é€ã€‚
-#define	TCIOFLUSH	2       // æ¸…æ¥æ”¶åˆ°çš„æ•°æ®ä½†ä¸è¯»ã€‚æ¸…å·²å†™çš„æ•°æ®ä½†ä¸ä¼ é€ã€‚
+/* tcflush() and TCFLSH use these */    /* tcflush()ºÍTCFLSHÊ¹ÓÃÕâĞ©·ûºÅ³£Êı */
+#define	TCIFLUSH	0       // Çå½ÓÊÕµ½µÄÊı¾İµ«²»¶Á¡£
+#define	TCOFLUSH	1       // ÇåÒÑĞ´µÄÊı¾İµ«²»´«ËÍ¡£
+#define	TCIOFLUSH	2       // Çå½ÓÊÕµ½µÄÊı¾İµ«²»¶Á¡£ÇåÒÑĞ´µÄÊı¾İµ«²»´«ËÍ¡£
 
-/* tcsetattr uses these */      /* tcsetattr()ä½¿ç”¨è¿™äº›ç¬¦å·å¸¸æ•° */
-#define	TCSANOW		0       // æ”¹å˜ç«‹å³å‘ç”Ÿã€‚
-#define	TCSADRAIN	1       // æ”¹å˜åœ¨æ‰€æœ‰å·²å†™çš„è¾“å‡ºè¢«ä¼ è¾“ä¹‹åå‘ç”Ÿã€‚
-#define	TCSAFLUSH	2       // æ”¹å˜åœ¨æ‰€æœ‰å·²å†™çš„è¾“å‡ºè¢«ä¼ è¾“ä¹‹åå¹¶ä¸”åœ¨æ‰€æœ‰æ¥æ”¶åˆ°ä½†è¿˜æ²¡æœ‰è¯»å–çš„æ•°æ®
-                                // è¢«ä¸¢å¼ƒä¹‹åå‘ç”Ÿã€‚
+/* tcsetattr uses these */      /* tcsetattr()Ê¹ÓÃÕâĞ©·ûºÅ³£Êı */
+#define	TCSANOW		0       // ¸Ä±äÁ¢¼´·¢Éú¡£
+#define	TCSADRAIN	1       // ¸Ä±äÔÚËùÓĞÒÑĞ´µÄÊä³ö±»´«ÊäÖ®ºó·¢Éú¡£
+#define	TCSAFLUSH	2       // ¸Ä±äÔÚËùÓĞÒÑĞ´µÄÊä³ö±»´«ÊäÖ®ºó²¢ÇÒÔÚËùÓĞ½ÓÊÕµ½µ«»¹Ã»ÓĞ¶ÁÈ¡µÄÊı¾İ
+                                // ±»¶ªÆúÖ®ºó·¢Éú¡£
 
-// ä»¥ä¸‹è¿™äº›å‡½æ•°åœ¨ç¼–è¯‘ç¯å¢ƒçš„å‡½æ•°åº“libc.aä¸­å®ç°ï¼Œå†…æ ¸ä¸­æ²¡æœ‰ã€‚åœ¨å‡½æ•°åº“å®ç°ä¸­ï¼Œè¿™äº›å‡½æ•°é€šè¿‡è°ƒç”¨ç³»ç»Ÿè°ƒç”¨ioctl()æ¥å®ç°ã€‚æœ‰å…³
-// ioctl()ç³»ç»Ÿè°ƒç”¨ï¼Œè¯·å‚è§fs/ioctl.cç¨‹åºã€‚
-// è¿”å›termios_pæ‰€æŒ‡termiosç»“æ„ä¸­çš„æ¥æ”¶æ³¢ç‰¹ç‡ã€‚
+// ÒÔÏÂÕâĞ©º¯ÊıÔÚ±àÒë»·¾³µÄº¯Êı¿âlibc.aÖĞÊµÏÖ£¬ÄÚºËÖĞÃ»ÓĞ¡£ÔÚº¯Êı¿âÊµÏÖÖĞ£¬ÕâĞ©º¯ÊıÍ¨¹ıµ÷ÓÃÏµÍ³µ÷ÓÃioctl()À´ÊµÏÖ¡£ÓĞ¹Ø
+// ioctl()ÏµÍ³µ÷ÓÃ£¬Çë²Î¼ûfs/ioctl.c³ÌĞò¡£
+// ·µ»Øtermios_pËùÖ¸termios½á¹¹ÖĞµÄ½ÓÊÕ²¨ÌØÂÊ¡£
 extern speed_t cfgetispeed(struct termios *termios_p);
-// è¿”å›termios_pæ‰€æŒ‡termiosç»“æ„ä¸­çš„å‘é€æ³¢ç‰¹ç‡ã€‚
+// ·µ»Øtermios_pËùÖ¸termios½á¹¹ÖĞµÄ·¢ËÍ²¨ÌØÂÊ¡£
 extern speed_t cfgetospeed(struct termios *termios_p);
-// å°†termios_pæ‰€æŒ‡termiosç»“æ„ä¸­çš„æ¥æ”¶æ³¢ç‰¹ç‡è®¾ç½®ä¸ºspeedã€‚
+// ½«termios_pËùÖ¸termios½á¹¹ÖĞµÄ½ÓÊÕ²¨ÌØÂÊÉèÖÃÎªspeed¡£
 extern int cfsetispeed(struct termios *termios_p, speed_t speed);
-// å°†termios_pæ‰€æŒ‡termiosç»“æ„ä¸­çš„å‘é€æ³¢ç‰¹ç‡è®¾ç½®ä¸ºspeedã€‚
+// ½«termios_pËùÖ¸termios½á¹¹ÖĞµÄ·¢ËÍ²¨ÌØÂÊÉèÖÃÎªspeed¡£
 extern int cfsetospeed(struct termios *termios_p, speed_t speed);
-// ç­‰å¾…fildesæ‰€æŒ‡å¯¹è±¡å·²å†™è¾“å‡ºæ•°æ®è¢«ä¼ é€å‡ºå»ã€‚
+// µÈ´ıfildesËùÖ¸¶ÔÏóÒÑĞ´Êä³öÊı¾İ±»´«ËÍ³öÈ¥¡£
 extern int tcdrain(int fildes);
-// æŒ‚èµ·/é‡å¯fildesæ‰€æŒ‡å¯¹è±¡æ•°æ®çš„æ¥æ”¶å’Œå‘é€ã€‚
+// ¹ÒÆğ/ÖØÆôfildesËùÖ¸¶ÔÏóÊı¾İµÄ½ÓÊÕºÍ·¢ËÍ¡£
 extern int tcflow(int fildes, int action);
-// ä¸¢å¼ƒfildesæŒ‡å®šå¯¹è±¡æ‰€æœ‰å·²å†™ä½†è¿˜æ²¡ä¼ é€ä»¥åŠæ‰€æœ‰å·²æ”¶åˆ°ä½†è¿˜æ²¡æœ‰è¯»å–çš„æ•°æ®ã€‚
+// ¶ªÆúfildesÖ¸¶¨¶ÔÏóËùÓĞÒÑĞ´µ«»¹Ã»´«ËÍÒÔ¼°ËùÓĞÒÑÊÕµ½µ«»¹Ã»ÓĞ¶ÁÈ¡µÄÊı¾İ¡£
 extern int tcflush(int fildes, int queue_selector);
-// è·å–ä¸å¥æŸ„fildeså¯¹åº”å¯¹è±¡çš„å‚æ•°ï¼Œå¹¶å°†å…¶ä¿å­˜åœ¨termios_pæ‰€æŒ‡åœ°åœ°æ–¹ã€‚
+// »ñÈ¡Óë¾ä±úfildes¶ÔÓ¦¶ÔÏóµÄ²ÎÊı£¬²¢½«Æä±£´æÔÚtermios_pËùÖ¸µØµØ·½¡£
 extern int tcgetattr(int fildes, struct termios *termios_p);
-// å¦‚æœç»ˆç«¯ä½¿ç”¨å¼‚æ­¥ä¸²è¡Œæ•°æ®ä¼ è¾“ï¼Œåˆ™åœ¨ä¸€å®šæ—¶é—´å†…è¿ç»­ä¼ è¾“ä¸€ç³»åˆ—0å€¼æ¯”ç‰¹ä½ã€‚
+// Èç¹ûÖÕ¶ËÊ¹ÓÃÒì²½´®ĞĞÊı¾İ´«Êä£¬ÔòÔÚÒ»¶¨Ê±¼äÄÚÁ¬Ğø´«ÊäÒ»ÏµÁĞ0Öµ±ÈÌØÎ»¡£
 extern int tcsendbreak(int fildes, int duration);
-// ä½¿ç”¨termiosç»“æ„æŒ‡é’ˆtermios_pæ‰€æŒ‡çš„æ•°æ®ï¼Œè®¾ç½®ä¸ç»ˆç«¯ç›¸å…³çš„å‚æ•°ã€‚
+// Ê¹ÓÃtermios½á¹¹Ö¸Õëtermios_pËùÖ¸µÄÊı¾İ£¬ÉèÖÃÓëÖÕ¶ËÏà¹ØµÄ²ÎÊı¡£
 extern int tcsetattr(int fildes, int optional_actions,
 	struct termios *termios_p);
 
 #endif
+

@@ -1,5 +1,5 @@
 /*
- * å†…æ ¸é…ç½®å¤´æ–‡ä»¶.å®šä¹‰ä½¿ç”¨çš„é”®ç›˜è¯­è¨€ç±»åž‹å’Œç¡¬ç›˜ç±»åž‹(HD_TYPE)å¯é€‰é¡¹.
+ * ÄÚºËÅäÖÃÍ·ÎÄ¼þ.¶¨ÒåÊ¹ÓÃµÄ¼üÅÌÓïÑÔÀàÐÍºÍÓ²ÅÌÀàÐÍ(HD_TYPE)¿ÉÑ¡Ïî.
  */
 #ifndef _CONFIG_H
 #define _CONFIG_H
@@ -8,7 +8,7 @@
  * Defines for what uname() should return
  */
 /*
- * å®šä¹‰uname()å‡½æ•°åº”è¯¥è¿”å›žçš„å€¼.
+ * ¶¨Òåuname()º¯ÊýÓ¦¸Ã·µ»ØµÄÖµ.
  */
 #define UTS_SYSNAME "Linux"
 #define UTS_NODENAME "(none)"	              /* set by sethostname() */
@@ -17,25 +17,25 @@
 #define UTS_MACHINE "i386"	                  /* hardware type */
 
 /* Don't touch these, unless you really know what your doing. */
-/* è¯·ä¸è¦éšæ„ä¿®æ”¹ä¸‹é¢å®šä¹‰å€¼ï¼Œé™¤éžä½ çŸ¥é“è‡ªå·±æ­£åœ¨å¹²ä»€ä¹ˆã€‚ */
-#define DEF_INITSEG	0x9000	                  /* å¼•å¯¼æ‰‡åŒºç¨‹åºå°†è¢«ç§»åŠ¨åˆ°çš„æ®µå€¼	*/
-#define DEF_SYSSEG	0x1000	                  /* å¼•å¯¼æ‰‡åŒºç¨‹åºæŠŠç³»ç»Ÿæ¨¡å—åŠ è½½åˆ°å†…å­˜çš„æ®µå€¼.	*/
-#define DEF_SETUPSEG	0x9020	              /* setupç¨‹åºæ‰€å¤„å†…å­˜æ®µä½ç½®.	*/
-#define DEF_SYSSIZE	0x3000	                  /* å†…æ ¸ç³»ç»Ÿæ¨¡å—é»˜è®¤æœ€å¤§èŠ‚æ•°(16å­—èŠ‚=1èŠ‚)	*/
+/* Çë²»ÒªËæÒâÐÞ¸ÄÏÂÃæ¶¨ÒåÖµ£¬³ý·ÇÄãÖªµÀ×Ô¼ºÕýÔÚ¸ÉÊ²Ã´¡£ */
+#define DEF_INITSEG	0x9000	                  /* Òýµ¼ÉÈÇø³ÌÐò½«±»ÒÆ¶¯µ½µÄ¶ÎÖµ	*/
+#define DEF_SYSSEG	0x1000	                  /* Òýµ¼ÉÈÇø³ÌÐò°ÑÏµÍ³Ä£¿é¼ÓÔØµ½ÄÚ´æµÄ¶ÎÖµ.	*/
+#define DEF_SETUPSEG	0x9020	              /* setup³ÌÐòËù´¦ÄÚ´æ¶ÎÎ»ÖÃ.	*/
+#define DEF_SYSSIZE	0x3000	                  /* ÄÚºËÏµÍ³Ä£¿éÄ¬ÈÏ×î´ó½ÚÊý(16×Ö½Ú=1½Ú)	*/
 
 /*
  * The root-device is no longer hard-coded. You can change the default
  * root-device by changing the line ROOT_DEV = XXX in boot/bootsect.s
  */
 /*
- * æ ¹æ–‡ä»¶ç³»ç»Ÿè®¾å¤‡å·²ä¸å†æ˜¯ç¡¬ç¼–ç çš„äº†.é€šè¿‡ä¿®æ”¹boot/bootsect.sæ–‡ä»¶ä¸­è¡ŒROOT_DEV=XXX,ä½ å¯ä»¥æ”¹å˜æ ¹è®¾å¤‡çš„é»˜è®¤è®¾ç½®å€¼.
+ * ¸ùÎÄ¼þÏµÍ³Éè±¸ÒÑ²»ÔÙÊÇÓ²±àÂëµÄÁË.Í¨¹ýÐÞ¸Äboot/bootsect.sÎÄ¼þÖÐÐÐROOT_DEV=XXX,Äã¿ÉÒÔ¸Ä±ä¸ùÉè±¸µÄÄ¬ÈÏÉèÖÃÖµ.
  */
 
 /*
  * The keyboard is now defined in kernel/chr_dev/keyboard.S
  */
 /*
- * çŽ°åœ¨é”®ç›˜ç±»åž‹è¢«æ”¾åœ¨kernel/chr_dev/keyboard.Sç¨‹åºä¸­å®šä¹‰.
+ * ÏÖÔÚ¼üÅÌÀàÐÍ±»·ÅÔÚkernel/chr_dev/keyboard.S³ÌÐòÖÐ¶¨Òå.
  */
 
 /*
@@ -54,14 +54,14 @@
  * #define HD_TYPE { h,s,c,wpcom,lz,ctl },{ h,s,c,wpcom,lz,ctl }
  */
 /*
- * é€šå¸¸,Linuxèƒ½å¤Ÿåœ¨å¯åŠ¨æ—¶ä»ŽBIOSä¸­èŽ·å–é©±åŠ¨å™¨çš„å‚æ•°,ä½†æ˜¯è‹¥ç”±äºŽæœªçŸ¥åŽŸå› è€Œæ²¡æœ‰å¾—åˆ°è¿™äº›å‚æ•°æ—¶,ä¼šä½¿ç¨‹åºæŸæ‰‹æ— ç­–.å¯¹äºŽè¿™ç§æƒ…å†µ,
- * ä½ å¯ä»¥å®šä¹‰HD_TYPE,å…¶ä¸­åŒ…æ‹¬ç¡¬ç›˜çš„æ‰€æœ‰ä½œæ¯.
+ * Í¨³£,LinuxÄÜ¹»ÔÚÆô¶¯Ê±´ÓBIOSÖÐ»ñÈ¡Çý¶¯Æ÷µÄ²ÎÊý,µ«ÊÇÈôÓÉÓÚÎ´ÖªÔ­Òò¶øÃ»ÓÐµÃµ½ÕâÐ©²ÎÊýÊ±,»áÊ¹³ÌÐòÊøÊÖÎÞ²ß.¶ÔÓÚÕâÖÖÇé¿ö,
+ * Äã¿ÉÒÔ¶¨ÒåHD_TYPE,ÆäÖÐ°üÀ¨Ó²ÅÌµÄËùÓÐ×÷Ï¢.
  *
- * HD_TYPEå®åº”è¯¥åƒä¸‹é¢è¿™æ ·çš„å½¢å¼:
+ * HD_TYPEºêÓ¦¸ÃÏñÏÂÃæÕâÑùµÄÐÎÊ½:
  *
  * #define HD_TYPE { head, sect, cyl, wpcom, lzone, ctl}
  *
- * å¯¹äºŽæœ‰ä¸¤ä¸ªç¡¬ç›˜çš„æƒ…å†µ,å‚æ•°ä¿¡æ¯éœ€ç”¨é€—å·åˆ†å¼€:
+ * ¶ÔÓÚÓÐÁ½¸öÓ²ÅÌµÄÇé¿ö,²ÎÊýÐÅÏ¢ÐèÓÃ¶ººÅ·Ö¿ª:
  *
  * #define HD_TYPE { h,s,c,wpcom,lz,ctl },{ h,s,c,wpcom,lz,ctl }
  */
@@ -77,12 +77,13 @@
  leave HD_TYPE undefined. This is the normal thing to do.
 */
 /*
- * ä¸‹é¢æ˜¯ä¸€ä¸ªä¾‹å­,ä¸¤ä¸ªç¡¬ç›˜,ç¬¬1ä¸ªæ˜¯ç±»åž‹2,ç¬¬2ä¸ªæ˜¯ç±»åž‹3:
+ * ÏÂÃæÊÇÒ»¸öÀý×Ó,Á½¸öÓ²ÅÌ,µÚ1¸öÊÇÀàÐÍ2,µÚ2¸öÊÇÀàÐÍ3:
  *
  * #define HD_TYPE { 4,17,615,300,615,8 }, { 6,17,615,300,615,0 }
  *
- * æ³¨:å¯¹åº”æ‰€æœ‰ç¡¬ç›˜,è‹¥å…¶ç£å¤´æ•°<=8,åˆ™ctlç­‰äºŽ0,è‹¥ç£å¤´æ•°å¤šäºŽ8ä¸ª,åˆ™ctl=8.
+ * ×¢:¶ÔÓ¦ËùÓÐÓ²ÅÌ,ÈôÆä´ÅÍ·Êý<=8,ÔòctlµÈÓÚ0,Èô´ÅÍ·Êý¶àÓÚ8¸ö,Ôòctl=8.
  *
- * å¦‚æžœä½ æƒ³è®©BIOSç»™å‡ºç¡¬ç›˜çš„ç±»åž‹,é‚£ä¹ˆåªéœ€ä¸å®šä¹‰HD_TYPE.è¿™æ˜¯é»˜è®¤æ“ä½œ.
+ * Èç¹ûÄãÏëÈÃBIOS¸ø³öÓ²ÅÌµÄÀàÐÍ,ÄÇÃ´Ö»Ðè²»¶¨ÒåHD_TYPE.ÕâÊÇÄ¬ÈÏ²Ù×÷.
  */
 #endif
+

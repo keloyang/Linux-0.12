@@ -2,100 +2,100 @@
  * Why isn't this a .c file?  Enquiring minds....
  */
 /*
- * ä¸ºä»€ä¹ˆè¿™ä¸æ˜¯ä¸€ä¸ª.cæ–‡ä»¶?åŠ¨åŠ¨è„‘ç­‹è‡ªå·±æƒ³æƒ³......
+ * ÎªÊ²Ã´Õâ²»ÊÇÒ»¸ö.cÎÄ¼ş?¶¯¶¯ÄÔ½î×Ô¼ºÏëÏë......
  */
 
 #include <linux/sched.h>
 
-extern int sys_setup();		    // 0 - ç³»ç»Ÿå¯åŠ¨åˆå§‹åŒ–è®¾ç½®å‡½æ•°ã€‚   ï¼ˆkernel/blk_drv/hd.cï¼‰
-extern int sys_exit();          // 1 - ç¨‹åºé€€å‡ºã€‚               ï¼ˆkernel/exit.cï¼‰
-extern int sys_fork();		    // 2 - åˆ›å»ºè¿›ç¨‹ã€‚               ï¼ˆkernel/sys_call.sï¼‰
-extern int sys_read();          // 3 - è¯»æ–‡ä»¶ã€‚                 ï¼ˆfs/read_write.cï¼‰
-extern int sys_write();		    // 4 - å†™æ–‡ä»¶ã€‚                 ï¼ˆfs/read_write.cï¼‰
-extern int sys_open();          // 5 - æ‰“å¼€æ–‡ä»¶ã€‚               ï¼ˆfs/open.cï¼‰
-extern int sys_close();         // 6 - å…³é—­æ–‡ä»¶ã€‚               ï¼ˆfs/open.cï¼‰
-extern int sys_waitpid();       // 7 - ç­‰å¾…è¿›ç¨‹ç»ˆæ­¢ã€‚            ï¼ˆkernel/exit.cï¼‰
-extern int sys_creat();         // 8 - åˆ›å»ºæ–‡ä»¶ã€‚               ï¼ˆfs/open.cï¼‰
-extern int sys_link();          // 9 - åˆ›å»ºä¸€ä¸ªæ–‡ä»¶çš„ç¡¬è¿æ¥ã€‚     ï¼ˆfs/namei.cï¼‰
-extern int sys_unlink();        // 10 - åˆ é™¤ä¸€ä¸ªæ–‡ä»¶åï¼ˆæˆ–åˆ é™¤æ–‡ä»¶ï¼‰ã€‚ï¼ˆfs/namei.cï¼‰
-extern int sys_execve();	    // 11 - æ‰§è¡Œç¨‹åº.			(kernel/sys_call.s)
-extern int sys_chdir();         // 12 - æ›´æ”¹å½“å‰ç›®å½•ã€‚           ï¼ˆfs/open.cï¼‰
-extern int sys_time();          // 13 - å–å½“å‰æ—¶é—´ã€‚              (kernel/sys.c)
-extern int sys_mknod();         // 14 - å»ºç«‹å—/å­—ç¬¦ç‰¹æ®Šæ–‡ä»¶ã€‚     ï¼ˆfs/namei.cï¼‰
-extern int sys_chmod();         // 15 - ä¿®æ”¹æ–‡ä»¶å±æ€§ã€‚           ï¼ˆfs/open.cï¼‰
-extern int sys_chown();         // 16 - ä¿®æ”¹æ–‡ä»¶å®¿ä¸»å’Œæ‰€å±ç»„ã€‚    ï¼ˆfs/open.cï¼‰
-extern int sys_break();         // 17                          ï¼ˆkernel/sys.cï¼‰*
-extern int sys_stat();          // 18 - ä½¿ç”¨è·¯å¾„åå–æ–‡ä»¶çŠ¶æ€ä¿¡æ¯ã€‚ ï¼ˆfs/stat.cï¼‰
-extern int sys_lseek();         // 19 - é‡æ–°å®šä½è¯»/å†™æ–‡ä»¶åç§»ã€‚   ï¼ˆfs/read_write.cï¼‰
-extern int sys_getpid();        // 20 - å–è¿›ç¨‹idã€‚              ï¼ˆkernel/sched.cï¼‰
-extern int sys_mount();         // 21 - å®‰è£…æ–‡ä»¶ç³»ç»Ÿã€‚           ï¼ˆfs/super.cï¼‰
-extern int sys_umount();        // 22 - å¸è½½æ–‡ä»¶ç³»ç»Ÿã€‚           ï¼ˆfs/super.cï¼‰
-extern int sys_setuid();        // 23 - è®¾ç½®è¿›ç¨‹ç”¨æˆ·idã€‚         ï¼ˆkernel/sys.cï¼‰
-extern int sys_getuid();        // 24 - å–è¿›ç¨‹ç”¨æˆ·idã€‚           ï¼ˆkernel/sched.cï¼‰
-extern int sys_stime();         // 25 - è®¾ç½®ç³»ç»Ÿæ—¶é—´æ—¥æœŸã€‚        ï¼ˆkernel/sys.cï¼‰*
-extern int sys_ptrace();        // 26 - ç¨‹åºè°ƒè¯•ã€‚              ï¼ˆkernel/sys.cï¼‰*
-extern int sys_alarm();         // 27 - è®¾ç½®æŠ¥è­¦ã€‚              ï¼ˆkernel/sched.cï¼‰
-extern int sys_fstat();         // 28 - ä½¿ç”¨æ–‡ä»¶å¥æŸ„å–æ–‡ä»¶çš„çŠ¶æ€ä¿¡æ¯ã€‚ï¼ˆfs/stat.cï¼‰
-extern int sys_pause();		    // 29 - æš‚åœè¿›ç¨‹è¿è¡Œã€‚           ï¼ˆkernel/sched.cï¼‰
-extern int sys_utime();         // 30 - æ”¹å˜æ–‡ä»¶çš„è®¿é—®å’Œä¿®æ”¹æ—¶é—´ã€‚ ï¼ˆfs/open.cï¼‰
-extern int sys_stty();          // 31 - ä¿®æ”¹ç»ˆç«¯è¡Œè®¾ç½®ã€‚         ï¼ˆkernel/sys.cï¼‰*
-extern int sys_gtty();          // 32 - å–ç»ˆç«¯è¡Œè®¾ç½®ä¿¡æ¯ã€‚       ï¼ˆkernel/sys.cï¼‰*
-extern int sys_access();        // 33 - æ£€æŸ¥ç”¨æˆ·å¯¹ä¸€ä¸ªæ–‡ä»¶çš„è®¿é—®æƒé™ã€‚ï¼ˆfs/open.cï¼‰
-extern int sys_nice();          // 34 - è®¾ç½®è¿›ç¨‹æ‰§è¡Œä¼˜å…ˆæƒã€‚      ï¼ˆkernel/sched.cï¼‰
-extern int sys_ftime();         // 35 - å–æ—¥æœŸå’Œæ—¶é—´ã€‚           ï¼ˆkernel/sys.cï¼‰*
-extern int sys_sync();          // 36 - åŒæ­¥é«˜é€Ÿç¼“å†²ä¸è®¾å¤‡ä¸­æ•°æ®    (fs/buffer.c)
-extern int sys_kill();          // 37 - ç»ˆæ­¢ä¸€ä¸ªè¿›ç¨‹ã€‚           ï¼ˆkernel/exit.cï¼‰
-extern int sys_rename();        // 38 - æ›´æ”¹æ–‡ä»¶åã€‚             ï¼ˆkernel/sys.cï¼‰*
-extern int sys_mkdir();         // 39 - åˆ›å»ºç›®å½•ã€‚              ï¼ˆfs/namei.cï¼‰
-extern int sys_rmdir();         // 50 - åˆ é™¤ç›®å½•ã€‚              ï¼ˆfs/namei.cï¼‰
-extern int sys_dup();		    // 41 - å¤åˆ¶æ–‡ä»¶å¥æŸ„.             (fs/fcntl.c)
-extern int sys_pipe();          // 42 - åˆ›å»ºç®¡é“ã€‚              ï¼ˆfs/pipe.cï¼‰
-extern int sys_times();         // 43 - å–è¿è¡Œæ—¶é—´ã€‚            ï¼ˆkernel/sys.c)
-extern int sys_prof();          // 44 - ç¨‹åºæ‰§è¡Œæ—¶é—´åŒºåŸŸã€‚       ï¼ˆkernel/sys.cï¼‰*
-extern int sys_brk();           // 45 - ä¿®æ”¹æ•°æ®æ®µé•¿åº¦.           (kernel/sys.c)
-extern int sys_setgid();        // 46 - è®¾ç½®è¿›ç¨‹ç»„idã€‚          ï¼ˆkernel/sys.cï¼‰
-extern int sys_getgid();        // 47 - å–è¿›ç¨‹ç»„idã€‚            ï¼ˆkernel/sys.cï¼‰
-extern int sys_signal();        // 48 - ä¿¡å·å¤„ç†ã€‚              ï¼ˆkernel/signal.cï¼‰
-extern int sys_geteuid();       // 49 - å–è¿›ç¨‹æœ‰æ•ˆç”¨æˆ·idã€‚       ï¼ˆkernel/sched.cï¼‰
-extern int sys_getegid();       // 50 - å–è¿›ç¨‹æœ‰æ•ˆç»„idã€‚        ï¼ˆkernel/sched.cï¼‰
-extern int sys_acct();          // 51 - è¿›ç¨‹è®°è´¦ã€‚              ï¼ˆkernel/sys.cï¼‰*
-extern int sys_phys();          // 52 -                       ï¼ˆkernel/sys.cï¼‰*
-extern int sys_lock();          // 53 -                       ï¼ˆkernel/sys.cï¼‰*
-extern int sys_ioctl();         // 54 - è®¾å¤‡è¾“å…¥è¾“å‡ºæ§åˆ¶.          (fs/ioctl.c)
-extern int sys_fcntl();         // 55 - æ–‡ä»¶å¥æŸ„æ§åˆ¶æ“ä½œã€‚       ï¼ˆfs/fcntl.cï¼‰
-extern int sys_mpx();           // 56 -                       ï¼ˆkernel/sys.cï¼‰*
-extern int sys_setpgid();       // 57 - è®¾ç½®è¿›ç¨‹ç»„idã€‚          ï¼ˆkernel/sys.cï¼‰
-extern int sys_ulimit();        // 58 - ç»Ÿè®¡è¿›ç¨‹ä½¿ç”¨èµ„æºæƒ…å†µã€‚    ï¼ˆkernel/sys.cï¼‰
-extern int sys_uname();         // 59 - æ˜¾ç¤ºç³»ç»Ÿä¿¡æ¯ã€‚          ï¼ˆkernel/sys.cï¼‰
-extern int sys_umask();         // 60 - å–é»˜è®¤æ–‡ä»¶åˆ›å»ºå±æ€§ç ã€‚    ï¼ˆkernel/sys.cï¼‰
-extern int sys_chroot();        // 61 - æ”¹å˜æ ¹ç›®å½•ã€‚            ï¼ˆfs/open.cï¼‰
-extern int sys_ustat();         // 62 - å–æ–‡ä»¶ç³»ç»Ÿä¿¡æ¯ã€‚         ï¼ˆfs/open.cï¼‰
-extern int sys_dup2();          // 63 - å¤åˆ¶æ–‡ä»¶å¥æŸ„ã€‚          ï¼ˆfs/fcntl.cï¼‰
-extern int sys_getppid();       // 64 - å–çˆ¶è¿›ç¨‹idã€‚            ï¼ˆkernel/sched.cï¼‰
-extern int sys_getpgrp();       // 65 - å–è¿›ç¨‹ç»„idï¼Œç­‰äºgetpgid(0)ã€‚ï¼ˆkernel/sys.cï¼‰
-extern int sys_setsid();        // 66 - åœ¨æ–°ä¼šè¯ä¸­è¿è¡Œç¨‹åºã€‚      ï¼ˆkernel/sys.cï¼‰
-extern int sys_sigaction();     // 67 - æ”¹å˜ä¿¡å·å¤„ç†è¿‡ç¨‹ã€‚       ï¼ˆkernel/signal.cï¼‰
-extern int sys_sgetmask();      // 68 - å–ä¿¡å·å±è”½ç ã€‚          ï¼ˆkernel/signal.cï¼‰
-extern int sys_ssetmask();      // 69 - è®¾ç½®ä¿¡å·å±è”½ç ã€‚         ï¼ˆkernel/signal.cï¼‰
-extern int sys_setreuid();      // 70 - è®¾ç½®çœŸå®ä¸/æˆ–æœ‰æ•ˆç”¨æˆ·idã€‚ ï¼ˆkernel/sys.cï¼‰
-extern int sys_setregid();      // 71 - è®¾ç½®çœŸå®ä¸/æˆ–æœ‰æ•ˆç»„idã€‚  ï¼ˆkernel/sys.cï¼‰
-extern int sys_sigpending();    // 73 - æ£€æŸ¥æš‚æœªå¤„ç†çš„ä¿¡å·ã€‚      ï¼ˆkernel/signal.cï¼‰
-extern int sys_sigsuspend();    // 72 - ä½¿ç”¨æ–°å±è”½ç æŒ‚èµ·è¿›ç¨‹ã€‚    ï¼ˆkernel/signal.cï¼‰
-extern int sys_sethostname();   // 74 - è®¾ç½®ä¸»æœºåã€‚            ï¼ˆkernel/sys.cï¼‰
-extern int sys_setrlimit();     // 75 - è®¾ç½®èµ„æºä½¿ç”¨é™åˆ¶ã€‚       ï¼ˆkernel/sys.cï¼‰
-extern int sys_getrlimit();     // 76 - å–å¾—è¿›ç¨‹ä½¿ç”¨èµ„æºçš„é™åˆ¶ã€‚  ï¼ˆkernel/sys.cï¼‰
+extern int sys_setup();		    // 0 - ÏµÍ³Æô¶¯³õÊ¼»¯ÉèÖÃº¯Êı¡£   £¨kernel/blk_drv/hd.c£©
+extern int sys_exit();          // 1 - ³ÌĞòÍË³ö¡£               £¨kernel/exit.c£©
+extern int sys_fork();		    // 2 - ´´½¨½ø³Ì¡£               £¨kernel/sys_call.s£©
+extern int sys_read();          // 3 - ¶ÁÎÄ¼ş¡£                 £¨fs/read_write.c£©
+extern int sys_write();		    // 4 - Ğ´ÎÄ¼ş¡£                 £¨fs/read_write.c£©
+extern int sys_open();          // 5 - ´ò¿ªÎÄ¼ş¡£               £¨fs/open.c£©
+extern int sys_close();         // 6 - ¹Ø±ÕÎÄ¼ş¡£               £¨fs/open.c£©
+extern int sys_waitpid();       // 7 - µÈ´ı½ø³ÌÖÕÖ¹¡£            £¨kernel/exit.c£©
+extern int sys_creat();         // 8 - ´´½¨ÎÄ¼ş¡£               £¨fs/open.c£©
+extern int sys_link();          // 9 - ´´½¨Ò»¸öÎÄ¼şµÄÓ²Á¬½Ó¡£     £¨fs/namei.c£©
+extern int sys_unlink();        // 10 - É¾³ıÒ»¸öÎÄ¼şÃû£¨»òÉ¾³ıÎÄ¼ş£©¡££¨fs/namei.c£©
+extern int sys_execve();	    // 11 - Ö´ĞĞ³ÌĞò.			(kernel/sys_call.s)
+extern int sys_chdir();         // 12 - ¸ü¸Äµ±Ç°Ä¿Â¼¡£           £¨fs/open.c£©
+extern int sys_time();          // 13 - È¡µ±Ç°Ê±¼ä¡£              (kernel/sys.c)
+extern int sys_mknod();         // 14 - ½¨Á¢¿é/×Ö·ûÌØÊâÎÄ¼ş¡£     £¨fs/namei.c£©
+extern int sys_chmod();         // 15 - ĞŞ¸ÄÎÄ¼şÊôĞÔ¡£           £¨fs/open.c£©
+extern int sys_chown();         // 16 - ĞŞ¸ÄÎÄ¼şËŞÖ÷ºÍËùÊô×é¡£    £¨fs/open.c£©
+extern int sys_break();         // 17                          £¨kernel/sys.c£©*
+extern int sys_stat();          // 18 - Ê¹ÓÃÂ·¾¶ÃûÈ¡ÎÄ¼ş×´Ì¬ĞÅÏ¢¡£ £¨fs/stat.c£©
+extern int sys_lseek();         // 19 - ÖØĞÂ¶¨Î»¶Á/Ğ´ÎÄ¼şÆ«ÒÆ¡£   £¨fs/read_write.c£©
+extern int sys_getpid();        // 20 - È¡½ø³Ìid¡£              £¨kernel/sched.c£©
+extern int sys_mount();         // 21 - °²×°ÎÄ¼şÏµÍ³¡£           £¨fs/super.c£©
+extern int sys_umount();        // 22 - Ğ¶ÔØÎÄ¼şÏµÍ³¡£           £¨fs/super.c£©
+extern int sys_setuid();        // 23 - ÉèÖÃ½ø³ÌÓÃ»§id¡£         £¨kernel/sys.c£©
+extern int sys_getuid();        // 24 - È¡½ø³ÌÓÃ»§id¡£           £¨kernel/sched.c£©
+extern int sys_stime();         // 25 - ÉèÖÃÏµÍ³Ê±¼äÈÕÆÚ¡£        £¨kernel/sys.c£©*
+extern int sys_ptrace();        // 26 - ³ÌĞòµ÷ÊÔ¡£              £¨kernel/sys.c£©*
+extern int sys_alarm();         // 27 - ÉèÖÃ±¨¾¯¡£              £¨kernel/sched.c£©
+extern int sys_fstat();         // 28 - Ê¹ÓÃÎÄ¼ş¾ä±úÈ¡ÎÄ¼şµÄ×´Ì¬ĞÅÏ¢¡££¨fs/stat.c£©
+extern int sys_pause();		    // 29 - ÔİÍ£½ø³ÌÔËĞĞ¡£           £¨kernel/sched.c£©
+extern int sys_utime();         // 30 - ¸Ä±äÎÄ¼şµÄ·ÃÎÊºÍĞŞ¸ÄÊ±¼ä¡£ £¨fs/open.c£©
+extern int sys_stty();          // 31 - ĞŞ¸ÄÖÕ¶ËĞĞÉèÖÃ¡£         £¨kernel/sys.c£©*
+extern int sys_gtty();          // 32 - È¡ÖÕ¶ËĞĞÉèÖÃĞÅÏ¢¡£       £¨kernel/sys.c£©*
+extern int sys_access();        // 33 - ¼ì²éÓÃ»§¶ÔÒ»¸öÎÄ¼şµÄ·ÃÎÊÈ¨ÏŞ¡££¨fs/open.c£©
+extern int sys_nice();          // 34 - ÉèÖÃ½ø³ÌÖ´ĞĞÓÅÏÈÈ¨¡£      £¨kernel/sched.c£©
+extern int sys_ftime();         // 35 - È¡ÈÕÆÚºÍÊ±¼ä¡£           £¨kernel/sys.c£©*
+extern int sys_sync();          // 36 - Í¬²½¸ßËÙ»º³åÓëÉè±¸ÖĞÊı¾İ    (fs/buffer.c)
+extern int sys_kill();          // 37 - ÖÕÖ¹Ò»¸ö½ø³Ì¡£           £¨kernel/exit.c£©
+extern int sys_rename();        // 38 - ¸ü¸ÄÎÄ¼şÃû¡£             £¨kernel/sys.c£©*
+extern int sys_mkdir();         // 39 - ´´½¨Ä¿Â¼¡£              £¨fs/namei.c£©
+extern int sys_rmdir();         // 50 - É¾³ıÄ¿Â¼¡£              £¨fs/namei.c£©
+extern int sys_dup();		    // 41 - ¸´ÖÆÎÄ¼ş¾ä±ú.             (fs/fcntl.c)
+extern int sys_pipe();          // 42 - ´´½¨¹ÜµÀ¡£              £¨fs/pipe.c£©
+extern int sys_times();         // 43 - È¡ÔËĞĞÊ±¼ä¡£            £¨kernel/sys.c)
+extern int sys_prof();          // 44 - ³ÌĞòÖ´ĞĞÊ±¼äÇøÓò¡£       £¨kernel/sys.c£©*
+extern int sys_brk();           // 45 - ĞŞ¸ÄÊı¾İ¶Î³¤¶È.           (kernel/sys.c)
+extern int sys_setgid();        // 46 - ÉèÖÃ½ø³Ì×éid¡£          £¨kernel/sys.c£©
+extern int sys_getgid();        // 47 - È¡½ø³Ì×éid¡£            £¨kernel/sys.c£©
+extern int sys_signal();        // 48 - ĞÅºÅ´¦Àí¡£              £¨kernel/signal.c£©
+extern int sys_geteuid();       // 49 - È¡½ø³ÌÓĞĞ§ÓÃ»§id¡£       £¨kernel/sched.c£©
+extern int sys_getegid();       // 50 - È¡½ø³ÌÓĞĞ§×éid¡£        £¨kernel/sched.c£©
+extern int sys_acct();          // 51 - ½ø³Ì¼ÇÕË¡£              £¨kernel/sys.c£©*
+extern int sys_phys();          // 52 -                       £¨kernel/sys.c£©*
+extern int sys_lock();          // 53 -                       £¨kernel/sys.c£©*
+extern int sys_ioctl();         // 54 - Éè±¸ÊäÈëÊä³ö¿ØÖÆ.          (fs/ioctl.c)
+extern int sys_fcntl();         // 55 - ÎÄ¼ş¾ä±ú¿ØÖÆ²Ù×÷¡£       £¨fs/fcntl.c£©
+extern int sys_mpx();           // 56 -                       £¨kernel/sys.c£©*
+extern int sys_setpgid();       // 57 - ÉèÖÃ½ø³Ì×éid¡£          £¨kernel/sys.c£©
+extern int sys_ulimit();        // 58 - Í³¼Æ½ø³ÌÊ¹ÓÃ×ÊÔ´Çé¿ö¡£    £¨kernel/sys.c£©
+extern int sys_uname();         // 59 - ÏÔÊ¾ÏµÍ³ĞÅÏ¢¡£          £¨kernel/sys.c£©
+extern int sys_umask();         // 60 - È¡Ä¬ÈÏÎÄ¼ş´´½¨ÊôĞÔÂë¡£    £¨kernel/sys.c£©
+extern int sys_chroot();        // 61 - ¸Ä±ä¸ùÄ¿Â¼¡£            £¨fs/open.c£©
+extern int sys_ustat();         // 62 - È¡ÎÄ¼şÏµÍ³ĞÅÏ¢¡£         £¨fs/open.c£©
+extern int sys_dup2();          // 63 - ¸´ÖÆÎÄ¼ş¾ä±ú¡£          £¨fs/fcntl.c£©
+extern int sys_getppid();       // 64 - È¡¸¸½ø³Ìid¡£            £¨kernel/sched.c£©
+extern int sys_getpgrp();       // 65 - È¡½ø³Ì×éid£¬µÈÓÚgetpgid(0)¡££¨kernel/sys.c£©
+extern int sys_setsid();        // 66 - ÔÚĞÂ»á»°ÖĞÔËĞĞ³ÌĞò¡£      £¨kernel/sys.c£©
+extern int sys_sigaction();     // 67 - ¸Ä±äĞÅºÅ´¦Àí¹ı³Ì¡£       £¨kernel/signal.c£©
+extern int sys_sgetmask();      // 68 - È¡ĞÅºÅÆÁ±ÎÂë¡£          £¨kernel/signal.c£©
+extern int sys_ssetmask();      // 69 - ÉèÖÃĞÅºÅÆÁ±ÎÂë¡£         £¨kernel/signal.c£©
+extern int sys_setreuid();      // 70 - ÉèÖÃÕæÊµÓë/»òÓĞĞ§ÓÃ»§id¡£ £¨kernel/sys.c£©
+extern int sys_setregid();      // 71 - ÉèÖÃÕæÊµÓë/»òÓĞĞ§×éid¡£  £¨kernel/sys.c£©
+extern int sys_sigpending();    // 73 - ¼ì²éÔİÎ´´¦ÀíµÄĞÅºÅ¡£      £¨kernel/signal.c£©
+extern int sys_sigsuspend();    // 72 - Ê¹ÓÃĞÂÆÁ±ÎÂë¹ÒÆğ½ø³Ì¡£    £¨kernel/signal.c£©
+extern int sys_sethostname();   // 74 - ÉèÖÃÖ÷»úÃû¡£            £¨kernel/sys.c£©
+extern int sys_setrlimit();     // 75 - ÉèÖÃ×ÊÔ´Ê¹ÓÃÏŞÖÆ¡£       £¨kernel/sys.c£©
+extern int sys_getrlimit();     // 76 - È¡µÃ½ø³ÌÊ¹ÓÃ×ÊÔ´µÄÏŞÖÆ¡£  £¨kernel/sys.c£©
 extern int sys_getrusage();     // 77 -
-extern int sys_gettimeofday();  // 78 - è·å–å½“æ—¥æ—¶é—´ã€‚          ï¼ˆkernel/sys.cï¼‰
-extern int sys_settimeofday();  // 79 - è®¾ç½®å½“æ—¥æ—¶é—´ã€‚          ï¼ˆkernel/sys.cï¼‰
-extern int sys_getgroups();     // 80 - å–å¾—è¿›ç¨‹æ‰€æœ‰ç»„æ ‡è¯†å·ã€‚    ï¼ˆkernel/sys.cï¼‰
-extern int sys_setgroups();     // 81 - è®¾ç½®è¿›ç¨‹æ ‡è¯†å·æ•°ç»„ã€‚     ï¼ˆkernel/sys.cï¼‰
-extern int sys_select();        // 82 - ç­‰å¾…æ–‡ä»¶æè¿°ç¬¦çŠ¶æ€æ”¹å˜ã€‚  ï¼ˆfs/select.cï¼‰
-extern int sys_symlink();       // 83 - å»ºç«‹ç¬¦å·é“¾æ¥ã€‚          ï¼ˆfs/namei.cï¼‰
-extern int sys_lstat();         // 84 - å–ç¬¦å·é“¾æ¥æ–‡ä»¶çŠ¶æ€ã€‚     ï¼ˆfs/stat.cï¼‰
-extern int sys_readlink();      // 85 - è¯»å–ç¬¦å·é“¾æ¥æ–‡ä»¶ä¿¡æ¯ã€‚    ï¼ˆfs/stat.cï¼‰
-extern int sys_uselib();        // 86 - é€‰æ‹©å…±äº«åº“ã€‚            ï¼ˆfs/exec.cï¼‰
+extern int sys_gettimeofday();  // 78 - »ñÈ¡µ±ÈÕÊ±¼ä¡£          £¨kernel/sys.c£©
+extern int sys_settimeofday();  // 79 - ÉèÖÃµ±ÈÕÊ±¼ä¡£          £¨kernel/sys.c£©
+extern int sys_getgroups();     // 80 - È¡µÃ½ø³ÌËùÓĞ×é±êÊ¶ºÅ¡£    £¨kernel/sys.c£©
+extern int sys_setgroups();     // 81 - ÉèÖÃ½ø³Ì±êÊ¶ºÅÊı×é¡£     £¨kernel/sys.c£©
+extern int sys_select();        // 82 - µÈ´ıÎÄ¼şÃèÊö·û×´Ì¬¸Ä±ä¡£  £¨fs/select.c£©
+extern int sys_symlink();       // 83 - ½¨Á¢·ûºÅÁ´½Ó¡£          £¨fs/namei.c£©
+extern int sys_lstat();         // 84 - È¡·ûºÅÁ´½ÓÎÄ¼ş×´Ì¬¡£     £¨fs/stat.c£©
+extern int sys_readlink();      // 85 - ¶ÁÈ¡·ûºÅÁ´½ÓÎÄ¼şĞÅÏ¢¡£    £¨fs/stat.c£©
+extern int sys_uselib();        // 86 - Ñ¡Ôñ¹²Ïí¿â¡£            £¨fs/exec.c£©
 
-// ç³»ç»Ÿè°ƒç”¨å‡½æ•°æŒ‡é’ˆè¡¨.ç”¨äºç³»ç»Ÿè°ƒç”¨ä¸­æ–­å¤„ç†ç¨‹åº(int 0x80),ä½œä¸ºè·³è½¬è¡¨.
+// ÏµÍ³µ÷ÓÃº¯ÊıÖ¸Õë±í.ÓÃÓÚÏµÍ³µ÷ÓÃÖĞ¶Ï´¦Àí³ÌĞò(int 0x80),×÷ÎªÌø×ª±í.
 fn_ptr sys_call_table[] = { sys_setup, sys_exit, sys_fork, sys_read,
 sys_write, sys_open, sys_close, sys_waitpid, sys_creat, sys_link,
 sys_unlink, sys_execve, sys_chdir, sys_time, sys_mknod, sys_chmod,
@@ -114,5 +114,6 @@ sys_settimeofday, sys_getgroups, sys_setgroups, sys_select, sys_symlink,
 sys_lstat, sys_readlink, sys_uselib };
 
 /* So we don't have to do any more manual updating.... */
-/*ã€€ä¸‹é¢è¿™æ ·å®šä¹‰å,æˆ‘ä»¬å°±æ— éœ€æ‰‹å·¥æ›´æ–°ç³»ç»Ÿè°ƒç”¨æ•°ç›®äº†ã€€*/
+/*¡¡ÏÂÃæÕâÑù¶¨Òåºó,ÎÒÃÇ¾ÍÎŞĞèÊÖ¹¤¸üĞÂÏµÍ³µ÷ÓÃÊıÄ¿ÁË¡¡*/
 int NR_syscalls = sizeof(sys_call_table)/sizeof(fn_ptr);
+

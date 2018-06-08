@@ -1,21 +1,21 @@
 #ifndef _SYS_TIME_H
 #define _SYS_TIME_H
 
-/* gettimofday returns this */          /*  gettimeofday()å‡½æ•°è¿”å›è¯¥æ—¶é—´ç»“æ„ */
+/* gettimofday returns this */          /*  gettimeofday()º¯Êı·µ»Ø¸ÃÊ±¼ä½á¹¹ */
 struct timeval {
-	long	tv_sec;		/* seconds */           // ç§’ã€‚
-	long	tv_usec;	/* microseconds */      // å¾®ç§’ã€‚
+	long	tv_sec;		/* seconds */           // Ãë¡£
+	long	tv_usec;	/* microseconds */      // Î¢Ãë¡£
 };
 
-// æ—¶é—´åŒºç»“æ„ã€‚tzä¸ºæ—¶åŒºï¼ˆTime Zoneï¼‰çš„ç¼©å†™ï¼ŒDSTï¼ˆDaylight Saving Timeï¼‰æ˜¯å¤ä»¤æ—¶çš„ç¼©å†™ã€‚
+// Ê±¼äÇø½á¹¹¡£tzÎªÊ±Çø£¨Time Zone£©µÄËõĞ´£¬DST£¨Daylight Saving Time£©ÊÇÏÄÁîÊ±µÄËõĞ´¡£
 struct timezone {
-	int	tz_minuteswest;	/* minutes west of Greenwich */ // æ ¼æ—å°¼æ²»è¥¿éƒ¨åˆ†é’Ÿæ—¶é—´ã€‚
-	int	tz_dsttime;	/* type of dst correction */    // å¤ä»¤æ—¶åŒºè°ƒæ•´æ—¶é—´ã€‚
+	int	tz_minuteswest;	/* minutes west of Greenwich */ // ¸ñÁÖÄáÖÎÎ÷²¿·ÖÖÓÊ±¼ä¡£
+	int	tz_dsttime;	/* type of dst correction */    // ÏÄÁîÊ±Çøµ÷ÕûÊ±¼ä¡£
 };
 
-#define	DST_NONE	0	/* not on dst */                // éå¤ä»¤æ—¶ã€‚
-#define	DST_USA		1	/* USA style dst */             // USAå½¢å¼çš„å¤ä»¤æ—¶ã€‚
-#define	DST_AUST	2	/* Australian style dst */      // æ¾³å¤§åˆ©äºšå½¢å¼çš„å¤ä»¤æ—¶ã€‚
+#define	DST_NONE	0	/* not on dst */                // ·ÇÏÄÁîÊ±¡£
+#define	DST_USA		1	/* USA style dst */             // USAĞÎÊ½µÄÏÄÁîÊ±¡£
+#define	DST_AUST	2	/* Australian style dst */      // °Ä´óÀûÑÇĞÎÊ½µÄÏÄÁîÊ±¡£
 #define	DST_WET		3	/* Western European dst */
 #define	DST_MET		4	/* Middle European dst */
 #define	DST_EET		5	/* Eastern European dst */
@@ -25,7 +25,7 @@ struct timezone {
 #define	DST_TUR		9	/* Turkey */
 #define	DST_AUSTALT	10	/* Australian style with shift in 1986 */
 
-// æ–‡ä»¶æè¿°ç¬¦é›†çš„è®¾ç½®å®ï¼Œç”¨äºselect()å‡½æ•°ã€‚
+// ÎÄ¼şÃèÊö·û¼¯µÄÉèÖÃºê£¬ÓÃÓÚselect()º¯Êı¡£
 #define FD_SET(fd,fdsetp)	(*(fdsetp) |= (1 << (fd)))
 #define FD_CLR(fd,fdsetp)	(*(fdsetp) &= ~(1 << (fd)))
 #define FD_ISSET(fd,fdsetp)	((*(fdsetp) >> fd) & 1)
@@ -36,7 +36,7 @@ struct timezone {
  *
  * NB: timercmp does not work for >= or <=.
  */
-// timevalæ—¶é—´ç»“æ„çš„æ“ä½œå‡½æ•°ã€‚
+// timevalÊ±¼ä½á¹¹µÄ²Ù×÷º¯Êı¡£
 #define	timerisset(tvp)		((tvp)->tv_sec || (tvp)->tv_usec)
 #define	timercmp(tvp, uvp, cmp)	\
 	((tvp)->tv_sec cmp (uvp)->tv_sec || \
@@ -47,12 +47,12 @@ struct timezone {
  * Names of the interval timers, and structure
  * defining a timer setting.
  */
-/* å†…éƒ¨å®šæ—¶å™¨åç§°å’Œç»“æ„ï¼Œç”¨äºå®šä¹‰å®šæ—¶å™¨è®¾ç½®ã€‚*/
-#define	ITIMER_REAL	0       // ä»¥å®é™…æ—¶é—´é€’å‡ã€‚
-#define	ITIMER_VIRTUAL	1       // ä»¥è¿›ç¨‹è™šæ‹Ÿæ—¶é—´é€’å‡ã€‚
-#define	ITIMER_PROF	2       // ä»¥è¿›ç¨‹è™šæ‹Ÿæ—¶é—´æˆ–è€…å½“ç³»ç»Ÿè¿è¡Œæ—¶ä»¥è¿›ç¨‹æ—¶é—´é€’å‡ã€‚
+/* ÄÚ²¿¶¨Ê±Æ÷Ãû³ÆºÍ½á¹¹£¬ÓÃÓÚ¶¨Òå¶¨Ê±Æ÷ÉèÖÃ¡£*/
+#define	ITIMER_REAL	0       // ÒÔÊµ¼ÊÊ±¼äµİ¼õ¡£
+#define	ITIMER_VIRTUAL	1       // ÒÔ½ø³ÌĞéÄâÊ±¼äµİ¼õ¡£
+#define	ITIMER_PROF	2       // ÒÔ½ø³ÌĞéÄâÊ±¼ä»òÕßµ±ÏµÍ³ÔËĞĞÊ±ÒÔ½ø³ÌÊ±¼äµİ¼õ¡£
 
-// å†…éƒ¨æ—¶é—´ç»“æ„ã€‚å…¶ä¸­itï¼ˆInternal Timerï¼‰æ˜¯å†…éƒ¨å®šæ—¶å™¨çš„ç¼©å†™ã€‚
+// ÄÚ²¿Ê±¼ä½á¹¹¡£ÆäÖĞit£¨Internal Timer£©ÊÇÄÚ²¿¶¨Ê±Æ÷µÄËõĞ´¡£
 struct	itimerval {
 	struct	timeval it_interval;	/* timer interval */
 	struct	timeval it_value;	/* current value */
@@ -64,3 +64,4 @@ struct	itimerval {
 int gettimeofday(struct timeval * tp, struct timezone * tz);
 
 #endif /*_SYS_TIME_H*/
+

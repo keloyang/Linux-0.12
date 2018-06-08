@@ -2,13 +2,13 @@
  * Resource control/accounting header file for linux
  */
 /*
- * Linuxèµ„æºæ§åˆ¶/å®¡è®¡å¤´æ–‡ä»¶ã€‚
+ * Linux×ÊÔ´¿ØÖÆ/Éó¼ÆÍ·ÎÄ¼ş¡£
  */
 
 #ifndef _SYS_RESOURCE_H
 #define _SYS_RESOURCE_H
 
-// ä»¥ä¸‹ç¬¦å·å¸¸æ•°å’Œç»“æ„ç”¨äºgetrusage()ã€‚å‚è§kernel/sys.cã€‚
+// ÒÔÏÂ·ûºÅ³£ÊıºÍ½á¹¹ÓÃÓÚgetrusage()¡£²Î¼ûkernel/sys.c¡£
 /*
  * Definition of struct rusage taken from BSD 4.3 Reno
  * 
@@ -17,18 +17,18 @@
  * structure will lose.  This reduces the chances of that happening.
  */
 /*
- * rusageç»“æ„çš„å®šä¹‰å–è‡ªBSD 4.3 Renoç³»ç»Ÿã€‚
+ * rusage½á¹¹µÄ¶¨ÒåÈ¡×ÔBSD 4.3 RenoÏµÍ³¡£
  * 
- * æˆ‘ä»¬ç°åœ¨è¿˜æ²¡æœ‰æ”¯æŒè¯¥ç»“æ„ä¸­çš„æ‰€æœ‰è¿™äº›å­—æ®µï¼Œä½†æˆ‘ä»¬å¯èƒ½ä¼šæ”¯æŒå®ƒä»¬çš„....å¦åˆ™çš„è¯ï¼Œæ¯å½“æˆ‘ä»¬å¢åŠ æ–°çš„å­—æ®µï¼Œé‚£äº›ä¾èµ–äºè¿™ä¸ª
- * ç»“æ„çš„ç¨‹åºå°±ä¼šå‡ºé—®é¢˜ã€‚ç°åœ¨æŠŠæ‰€æœ‰å­—æ®µéƒ½åŒ…æ‹¬è¿›æ¥å°±å¯ä»¥é¿å…è¿™ç§äº‹æƒ…å‘ç”Ÿã€‚
+ * ÎÒÃÇÏÖÔÚ»¹Ã»ÓĞÖ§³Ö¸Ã½á¹¹ÖĞµÄËùÓĞÕâĞ©×Ö¶Î£¬µ«ÎÒÃÇ¿ÉÄÜ»áÖ§³ÖËüÃÇµÄ....·ñÔòµÄ»°£¬Ã¿µ±ÎÒÃÇÔö¼ÓĞÂµÄ×Ö¶Î£¬ÄÇĞ©ÒÀÀµÓÚÕâ¸ö
+ * ½á¹¹µÄ³ÌĞò¾Í»á³öÎÊÌâ¡£ÏÖÔÚ°ÑËùÓĞ×Ö¶Î¶¼°üÀ¨½øÀ´¾Í¿ÉÒÔ±ÜÃâÕâÖÖÊÂÇé·¢Éú¡£
  */
-// ä¸‹é¢æ˜¯getrusage()çš„å‚æ•°whoæ‰€ä½¿ç”¨çš„ç¬¦å·å¸¸æ•°ã€‚
-#define	RUSAGE_SELF	0       // è¿”å›å½“å‰è¿›ç¨‹çš„èµ„æºåˆ©ç”¨ä¿¡æ¯ã€‚
-#define	RUSAGE_CHILDREN	-1      // è¿”å›å½“å‰è¿›ç¨‹å·²ç»ˆæ­¢å’Œç­‰å¾…ç€çš„å­è¿›ç¨‹çš„èµ„æºåˆ©ç”¨ä¿¡æ¯ã€‚
+// ÏÂÃæÊÇgetrusage()µÄ²ÎÊıwhoËùÊ¹ÓÃµÄ·ûºÅ³£Êı¡£
+#define	RUSAGE_SELF	0       // ·µ»Øµ±Ç°½ø³ÌµÄ×ÊÔ´ÀûÓÃĞÅÏ¢¡£
+#define	RUSAGE_CHILDREN	-1      // ·µ»Øµ±Ç°½ø³ÌÒÑÖÕÖ¹ºÍµÈ´ı×ÅµÄ×Ó½ø³ÌµÄ×ÊÔ´ÀûÓÃĞÅÏ¢¡£
 
-// rusageæ˜¯è¿›ç¨‹çš„èµ„æºåˆ©ç”¨ç»Ÿè®¡ç»“æ„ï¼Œç”¨äºgetrusage()è¿”å›æŒ‡å®šè¿›ç¨‹å¯¹èµ„æºåˆ©ç”¨çš„ç»Ÿè®¡å€¼ã€‚Linux0.12å†…æ ¸ä»…ä½¿ç”¨äº†å‰ä¸¤ä¸ªå­—æ®µï¼Œ
-// å®ƒä»¬æ˜¯timevalç»“æ„ï¼ˆinclude/sys/time.hï¼‰ã€‚
-// ru_utime - è¿›ç¨‹åœ¨ç”¨æˆ·æ€è¿è¡Œæ—¶é—´ç»Ÿè®¡å€¼ï¼›ru_stime - è¿›ç¨‹åœ¨å†…æ ¸æ€è¿è¡Œæ—¶é—´ç»Ÿè®¡å€¼ã€‚
+// rusageÊÇ½ø³ÌµÄ×ÊÔ´ÀûÓÃÍ³¼Æ½á¹¹£¬ÓÃÓÚgetrusage()·µ»ØÖ¸¶¨½ø³Ì¶Ô×ÊÔ´ÀûÓÃµÄÍ³¼ÆÖµ¡£Linux0.12ÄÚºË½öÊ¹ÓÃÁËÇ°Á½¸ö×Ö¶Î£¬
+// ËüÃÇÊÇtimeval½á¹¹£¨include/sys/time.h£©¡£
+// ru_utime - ½ø³ÌÔÚÓÃ»§Ì¬ÔËĞĞÊ±¼äÍ³¼ÆÖµ£»ru_stime - ½ø³ÌÔÚÄÚºËÌ¬ÔËĞĞÊ±¼äÍ³¼ÆÖµ¡£
 struct	rusage {
 	struct timeval ru_utime;	/* user time used */
 	struct timeval ru_stime;	/* system time used */
@@ -48,38 +48,39 @@ struct	rusage {
 	long	ru_nivcsw;		/* involuntary " */
 };
 
-// ä¸‹é¢æ˜¯getrlimit()å’Œsetrlimit()ä½¿ç”¨çš„ç¬¦å·å¸¸æ•°å’Œç»“æ„ã€‚
+// ÏÂÃæÊÇgetrlimit()ºÍsetrlimit()Ê¹ÓÃµÄ·ûºÅ³£ÊıºÍ½á¹¹¡£
 /*
  * Resource limits
  */
 /*
- * èµ„æºé™åˆ¶ã€‚
+ * ×ÊÔ´ÏŞÖÆ¡£
  */
 
-// ä»¥ä¸‹æ˜¯Linux0.12å†…æ ¸ä¸­æ‰€å®šä¹‰çš„èµ„æºç§ç±»ï¼Œæ˜¯getrlimit()å’Œsetrlimit()ä¸­ç¬¬1ä¸ªå‚æ•°resourceçš„å–å€¼èŒƒå›´ã€‚å…¶å®è¿™äº›ç¬¦å·å¸¸æ•°
-// å°±æ˜¯è¿›ç¨‹ä»»åŠ¡ç»“æ„ä¸­rlim[]æ•°ç»„çš„é¡¹ç´¢å¼•å€¼ã€‚rlim[]æ•°ç»„æ¯ä¸€é¡¹éƒ½æ˜¯ä¸€ä¸ªrlimitç»“æ„ï¼Œè¯¥ç»“æ„è§ä¸‹é¢ã€‚
-#define RLIMIT_CPU	0		/* CPU time in ms */            /* ä½¿ç”¨çš„CPUæ—¶é—´ */
-#define RLIMIT_FSIZE	1		/* Maximum filesize */          /* æœ€å¤§æ–‡ä»¶é•¿åº¦ */
-#define RLIMIT_DATA	2		/* max data size */             /* æœ€å¤§æ•°æ®é•¿åº¦ */
-#define RLIMIT_STACK	3		/* max stack size */            /* æœ€å¤§æ ˆé•¿åº¦ */
-#define RLIMIT_CORE	4		/* max core file size */        /* æœ€å¤§coreæ–‡ä»¶é•¿åº¦ */
-#define RLIMIT_RSS	5		/* max resident set size */     /* æœ€å¤§é©»ç•™é›†å¤§å° */
+// ÒÔÏÂÊÇLinux0.12ÄÚºËÖĞËù¶¨ÒåµÄ×ÊÔ´ÖÖÀà£¬ÊÇgetrlimit()ºÍsetrlimit()ÖĞµÚ1¸ö²ÎÊıresourceµÄÈ¡Öµ·¶Î§¡£ÆäÊµÕâĞ©·ûºÅ³£Êı
+// ¾ÍÊÇ½ø³ÌÈÎÎñ½á¹¹ÖĞrlim[]Êı×éµÄÏîË÷ÒıÖµ¡£rlim[]Êı×éÃ¿Ò»Ïî¶¼ÊÇÒ»¸örlimit½á¹¹£¬¸Ã½á¹¹¼ûÏÂÃæ¡£
+#define RLIMIT_CPU	0		/* CPU time in ms */            /* Ê¹ÓÃµÄCPUÊ±¼ä */
+#define RLIMIT_FSIZE	1		/* Maximum filesize */          /* ×î´óÎÄ¼ş³¤¶È */
+#define RLIMIT_DATA	2		/* max data size */             /* ×î´óÊı¾İ³¤¶È */
+#define RLIMIT_STACK	3		/* max stack size */            /* ×î´óÕ»³¤¶È */
+#define RLIMIT_CORE	4		/* max core file size */        /* ×î´ócoreÎÄ¼ş³¤¶È */
+#define RLIMIT_RSS	5		/* max resident set size */     /* ×î´ó×¤Áô¼¯´óĞ¡ */
 
 #ifdef notdef
-#define RLIMIT_MEMLOCK	6		/* max locked-in-memory address space*/ /* é”å®šåŒº */
-#define RLIMIT_NPROC	7		/* max number of processes */           /* æœ€å¤§å­è¿›ç¨‹æ•° */
-#define RLIMIT_OFILE	8		/* max number of open files */          /* æœ€å¤§æ‰“å¼€æ–‡ä»¶æ•° */
+#define RLIMIT_MEMLOCK	6		/* max locked-in-memory address space*/ /* Ëø¶¨Çø */
+#define RLIMIT_NPROC	7		/* max number of processes */           /* ×î´ó×Ó½ø³ÌÊı */
+#define RLIMIT_OFILE	8		/* max number of open files */          /* ×î´ó´ò¿ªÎÄ¼şÊı */
 #endif
 
-// è¿™ä¸ªç¬¦å·å¸¸æ•°å®šä¹‰äº†Linuxä¸­é™åˆ¶çš„èµ„æºç§ç±»ã€‚RLIM_NLIMITS=6ï¼Œå› æ­¤ä»…å‰é¢6é¡¹æœ‰æ•ˆã€‚
+// Õâ¸ö·ûºÅ³£Êı¶¨ÒåÁËLinuxÖĞÏŞÖÆµÄ×ÊÔ´ÖÖÀà¡£RLIM_NLIMITS=6£¬Òò´Ë½öÇ°Ãæ6ÏîÓĞĞ§¡£
 #define RLIM_NLIMITS	6
 
-// è¡¨ç¤ºèµ„æºæ— é™ï¼Œæˆ–ä¸èƒ½ä¿®æ”¹ã€‚
+// ±íÊ¾×ÊÔ´ÎŞÏŞ£¬»ò²»ÄÜĞŞ¸Ä¡£
 #define RLIM_INFINITY	0x7fffffff
 
 struct rlimit {
-	int	rlim_cur;       // å½“å‰èµ„æºé™åˆ¶ï¼Œæˆ–ç§°è½¯é™åˆ¶ï¼ˆsoft_limit)ã€‚
-	int	rlim_max;       // ç¡¬é™åˆ¶(hard_limit)ã€‚
+	int	rlim_cur;       // µ±Ç°×ÊÔ´ÏŞÖÆ£¬»ò³ÆÈíÏŞÖÆ£¨soft_limit)¡£
+	int	rlim_max;       // Ó²ÏŞÖÆ(hard_limit)¡£
 };
 
 #endif /* _SYS_RESOURCE_H */
+

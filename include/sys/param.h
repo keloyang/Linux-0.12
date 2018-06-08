@@ -1,13 +1,14 @@
-// ç»™å‡ºäº†ä¸ç¡¬ä»¶ç³»ç»Ÿç›¸å…³çš„ä¸€äº›å‚æ•°å€¼
+// ¸ø³öÁËÓëÓ²¼şÏµÍ³Ïà¹ØµÄÒ»Ğ©²ÎÊıÖµ
 #ifndef _SYS_PARAM_H
 #define _SYS_PARAM_H
 
-#define HZ 100			/* ç³»ç»Ÿæ—¶é’Ÿé¢‘ç‡,æ¯ç§’ä¸­æ–­100æ¬¡ */
-#define EXEC_PAGESIZE 4096	/* é¡µé¢å¤§å° */
+#define HZ 100			/* ÏµÍ³Ê±ÖÓÆµÂÊ,Ã¿ÃëÖĞ¶Ï100´Î */
+#define EXEC_PAGESIZE 4096	/* Ò³Ãæ´óĞ¡ */
 
-#define NGROUPS		32	/* Max number of groups per user */ /* æ¯ä¸ªè¿›ç¨‹æœ€å¤šç»„å· */
+#define NGROUPS		32	/* Max number of groups per user */ /* Ã¿¸ö½ø³Ì×î¶à×éºÅ */
 #define NOGROUP		-1
 
-#define MAXHOSTNAMELEN 8	// ä¸»æœºåæœ€å¤§é•¿åº¦,8å­—èŠ‚.
+#define MAXHOSTNAMELEN 8	// Ö÷»úÃû×î´ó³¤¶È,8×Ö½Ú.
 
 #endif
+

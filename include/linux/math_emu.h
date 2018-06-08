@@ -9,21 +9,21 @@
 #include <linux/sched.h>
 
 struct info {
-	long ___math_ret;               // math_emulate()è°ƒç”¨è€…ï¼ˆint 7ï¼‰è¿”å›åœ°å€ã€‚
-	long ___orig_eip;               // ä¸´æ—¶ä¿å­˜åŸEIPçš„åœ°æ–¹ã€‚
-	long ___edi;                    // å¼‚å¸¸ä¸­æ–­int 7å¤„ç†è¿‡ç¨‹å…¥æ ˆçš„å¯„å­˜å™¨ã€‚
+	long ___math_ret;               // math_emulate()µ÷ÓÃÕß£¨int 7£©·µ»ØµØÖ·¡£
+	long ___orig_eip;               // ÁÙÊ±±£´æÔ­EIPµÄµØ·½¡£
+	long ___edi;                    // Òì³£ÖĞ¶Ïint 7´¦Àí¹ı³ÌÈëÕ»µÄ¼Ä´æÆ÷¡£
 	long ___esi;
 	long ___ebp;
-	long ___sys_call_ret;           // ä¸­æ–­7è¿”å›æ—¶å°†å»æ‰§è¡Œç³»ç»Ÿè°ƒç”¨çš„è¿”å›å¤„ç†ä»£ç ã€‚
-	long ___eax;                    // ä»¥ä¸‹éƒ¨åˆ†ï¼ˆ18--30è¡Œï¼‰ä¸ç³»ç»Ÿè°ƒç”¨æ—¶æ ˆä¸­ç»“æ„ç›¸åŒã€‚
+	long ___sys_call_ret;           // ÖĞ¶Ï7·µ»ØÊ±½«È¥Ö´ĞĞÏµÍ³µ÷ÓÃµÄ·µ»Ø´¦Àí´úÂë¡£
+	long ___eax;                    // ÒÔÏÂ²¿·Ö£¨18--30ĞĞ£©ÓëÏµÍ³µ÷ÓÃÊ±Õ»ÖĞ½á¹¹ÏàÍ¬¡£
 	long ___ebx;
 	long ___ecx;
 	long ___edx;
-	long ___orig_eax;               // å¦‚ä¸æ˜¯ç³»ç»Ÿè°ƒç”¨è€Œæ˜¯å…¶ä»–ä¸­æ–­æ—¶ï¼Œè¯¥å€¼ä¸º-1ã€‚
+	long ___orig_eax;               // Èç²»ÊÇÏµÍ³µ÷ÓÃ¶øÊÇÆäËûÖĞ¶ÏÊ±£¬¸ÃÖµÎª-1¡£
 	long ___fs;
 	long ___es;
 	long ___ds;
-	long ___eip;                    // 26--30è¡Œç”±CPUè‡ªåŠ¨å…¥æ ˆã€‚
+	long ___eip;                    // 26--30ĞĞÓÉCPU×Ô¶¯ÈëÕ»¡£
 	long ___cs;
 	long ___eflags;
 	long ___esp;
@@ -59,84 +59,84 @@ void __math_abort(struct info *, unsigned int);
  * want some kind of "no-alignt" pragma or something.
  */
 /*
- * Gccå¼ºåˆ¶å¯¹é½é—®é¢˜æ˜¯æ„šè ¢ï¼šæˆ‘æƒ³ä»…ä»…ä½¿ç”¨ä¸¤ä¸ªlongå»è¡¨ç¤ºä¸´æ—¶å®å‹64ä½çš„æœ‰æ•ˆæ•°ï¼Œä½†ã€‚
+ * GccÇ¿ÖÆ¶ÔÆëÎÊÌâÊÇÓŞ´À£ºÎÒÏë½ö½öÊ¹ÓÃÁ½¸ölongÈ¥±íÊ¾ÁÙÊ±ÊµĞÍ64Î»µÄÓĞĞ§Êı£¬µ«¡£
  */
-// ä¸´æ—¶å®æ•°ç»“æ„
+// ÁÙÊ±ÊµÊı½á¹¹
 typedef struct {
-	long a,b;               // æœ‰æ•ˆæ•°ã€‚
-	short exponent;         // æŒ‡æ•°ã€‚
+	long a,b;               // ÓĞĞ§Êı¡£
+	short exponent;         // Ö¸Êı¡£
 } temp_real;
 
-// ä¸´æ—¶å®æ•°ç»“æ„ï¼ˆä¸è¿›è¡Œå¯¹é½ï¼‰
+// ÁÙÊ±ÊµÊı½á¹¹£¨²»½øĞĞ¶ÔÆë£©
 typedef struct {
-	short m0,m1,m2,m3;      // æœ‰æ•ˆæ•°ã€‚
-	short exponent;         // æŒ‡æ•°ã€‚
+	short m0,m1,m2,m3;      // ÓĞĞ§Êı¡£
+	short exponent;         // Ö¸Êı¡£
 } temp_real_unaligned;
 
 #define real_to_real(a,b) \
 ((*(long long *) (b) = *(long long *) (a)),((b)->exponent = (a)->exponent))
 
-// é•¿å®å‹ç»“æ„ã€‚
+// ³¤ÊµĞÍ½á¹¹¡£
 typedef struct {
 	long a,b;
 } long_real;
 
-typedef long short_real;        // çŸ­å®å‹ã€‚
+typedef long short_real;        // ¶ÌÊµĞÍ¡£
 
 typedef struct {
 	long a,b;
 	short sign;
-} temp_int;                     // ä¸´æ—¶æ•´å‹ã€‚
+} temp_int;                     // ÁÙÊ±ÕûĞÍ¡£
 
-// åå¤„ç†å™¨çŠ¶æ€å­—æ•°æ®ç»“æ„ã€‚
+// Ğ­´¦ÀíÆ÷×´Ì¬×ÖÊı¾İ½á¹¹¡£
 struct swd {
-	int ie:1;               // æ— æ•ˆæ“ä½œã€‚
-	int de:1;               // éè§„æ ¼åŒ–ã€‚
-	int ze:1;               // é™¤é›¶ã€‚
-	int oe:1;               // ä¸Šæº¢å‡ºã€‚
-	int ue:1;               // ä¸‹æº¢å‡ºã€‚
-	int pe:1;               // ç²¾åº¦ã€‚
-	int sf:1;               // æ ˆå‡ºé”™æ ‡å¿—ã€‚
+	int ie:1;               // ÎŞĞ§²Ù×÷¡£
+	int de:1;               // ·Ç¹æ¸ñ»¯¡£
+	int ze:1;               // ³ıÁã¡£
+	int oe:1;               // ÉÏÒç³ö¡£
+	int ue:1;               // ÏÂÒç³ö¡£
+	int pe:1;               // ¾«¶È¡£
+	int sf:1;               // Õ»³ö´í±êÖ¾¡£
 	int ir:1;               // 
-	int c0:1;               // æ¡ä»¶ä½ã€‚
+	int c0:1;               // Ìõ¼şÎ»¡£
 	int c1:1;
 	int c2:1;
-	int top:3;              // ç”¨äºæŒ‡æ˜å½“å‰å“ªä¸ª80ä½å¯„å­˜å™¨ä½äºæ ˆé¡¶ã€‚
+	int top:3;              // ÓÃÓÚÖ¸Ã÷µ±Ç°ÄÄ¸ö80Î»¼Ä´æÆ÷Î»ÓÚÕ»¶¥¡£
 	int c3:1;
-	int b:1;                // å¿™ã€‚
+	int b:1;                // Ã¦¡£
 };
 
-#define I387 (current->tss.i387)        // å½“å‰ä»»åŠ¡ç»“æ„ä¸­ä¿å­˜çš„æ•°å­¦åå¤„ç†å™¨ç»“æ„ã€‚
-#define SWD (*(struct swd *) &I387.swd) // åå¤„ç†å™¨çŠ¶æ€å­—ã€‚
-#define ROUNDING ((I387.cwd >> 10) & 3) // å–æ§åˆ¶å­—ä¸­èˆå…¥æ§åˆ¶å­—æ®µã€‚
-#define PRECISION ((I387.cwd >> 8) & 3) // å–æ§åˆ¶å­—ä¸­ç²¾åº¦æ§åˆ¶å­—æ®µã€‚
+#define I387 (current->tss.i387)        // µ±Ç°ÈÎÎñ½á¹¹ÖĞ±£´æµÄÊıÑ§Ğ­´¦ÀíÆ÷½á¹¹¡£
+#define SWD (*(struct swd *) &I387.swd) // Ğ­´¦ÀíÆ÷×´Ì¬×Ö¡£
+#define ROUNDING ((I387.cwd >> 10) & 3) // È¡¿ØÖÆ×ÖÖĞÉáÈë¿ØÖÆ×Ö¶Î¡£
+#define PRECISION ((I387.cwd >> 8) & 3) // È¡¿ØÖÆ×ÖÖĞ¾«¶È¿ØÖÆ×Ö¶Î¡£
 
 #define BITS24	0
 #define BITS53	2
 #define BITS64	3
 
-#define ROUND_NEAREST	0               // èˆå…¥åˆ°æœ€è¿‘æˆ–å¶æ•°ã€‚
-#define ROUND_DOWN	1               // è¶‹å‘è´Ÿæ— é™ã€‚
-#define ROUND_UP	2               // è¶‹å‘æ­£æ— é™ã€‚
-#define ROUND_0		3               // æ— æ•ˆã€‚
+#define ROUND_NEAREST	0               // ÉáÈëµ½×î½ü»òÅ¼Êı¡£
+#define ROUND_DOWN	1               // Ç÷Ïò¸ºÎŞÏŞ¡£
+#define ROUND_UP	2               // Ç÷ÏòÕıÎŞÏŞ¡£
+#define ROUND_0		3               // ÎŞĞ§¡£
 
-#define CONSTZ   (temp_real_unaligned) {0x0000,0x0000,0x0000,0x0000,0x0000}     // å¸¸æ•°0.0ã€‚
-#define CONST1   (temp_real_unaligned) {0x0000,0x0000,0x0000,0x8000,0x3FFF}     // ä¸´æ—¶å®æ•°1.0ã€‚
-#define CONSTPI  (temp_real_unaligned) {0xC235,0x2168,0xDAA2,0xC90F,0x4000}     // å¸¸æ•°Piã€‚
-#define CONSTLN2 (temp_real_unaligned) {0x79AC,0xD1CF,0x17F7,0xB172,0x3FFE}     // å¸¸æ•°Loge(2)ã€‚
-#define CONSTLG2 (temp_real_unaligned) {0xF799,0xFBCF,0x9A84,0x9A20,0x3FFD}     // å¸¸æ•°Log10(2)ã€‚
-#define CONSTL2E (temp_real_unaligned) {0xF0BC,0x5C17,0x3B29,0xB8AA,0x3FFF}     // å¸¸æ•°Log2(e)ã€‚
-#define CONSTL2T (temp_real_unaligned) {0x8AFE,0xCD1B,0x784B,0xD49A,0x4000}     // å¸¸æ•°Log2(10)ã€‚
+#define CONSTZ   (temp_real_unaligned) {0x0000,0x0000,0x0000,0x0000,0x0000}     // ³£Êı0.0¡£
+#define CONST1   (temp_real_unaligned) {0x0000,0x0000,0x0000,0x8000,0x3FFF}     // ÁÙÊ±ÊµÊı1.0¡£
+#define CONSTPI  (temp_real_unaligned) {0xC235,0x2168,0xDAA2,0xC90F,0x4000}     // ³£ÊıPi¡£
+#define CONSTLN2 (temp_real_unaligned) {0x79AC,0xD1CF,0x17F7,0xB172,0x3FFE}     // ³£ÊıLoge(2)¡£
+#define CONSTLG2 (temp_real_unaligned) {0xF799,0xFBCF,0x9A84,0x9A20,0x3FFD}     // ³£ÊıLog10(2)¡£
+#define CONSTL2E (temp_real_unaligned) {0xF0BC,0x5C17,0x3B29,0xB8AA,0x3FFF}     // ³£ÊıLog2(e)¡£
+#define CONSTL2T (temp_real_unaligned) {0x8AFE,0xCD1B,0x784B,0xD49A,0x4000}     // ³£ÊıLog2(10)¡£
 
-// ç½®çŠ¶æ€å­—æ§åˆ¶å™¨ä¸­å¼‚å¸¸ä½ã€‚
-#define set_IE() (I387.swd |= 1)        // æ— æ•ˆæ“ä½œã€‚
-#define set_DE() (I387.swd |= 2)        // éè§„æ ¼åŒ–ã€‚
-#define set_ZE() (I387.swd |= 4)        // é™¤é›¶ã€‚
-#define set_OE() (I387.swd |= 8)        // ä¸Šæº¢å‡ºã€‚
-#define set_UE() (I387.swd |= 16)       // ä¸‹æº¢å‡ºã€‚
-#define set_PE() (I387.swd |= 32)       // ç²¾åº¦ã€‚
+// ÖÃ×´Ì¬×Ö¿ØÖÆÆ÷ÖĞÒì³£Î»¡£
+#define set_IE() (I387.swd |= 1)        // ÎŞĞ§²Ù×÷¡£
+#define set_DE() (I387.swd |= 2)        // ·Ç¹æ¸ñ»¯¡£
+#define set_ZE() (I387.swd |= 4)        // ³ıÁã¡£
+#define set_OE() (I387.swd |= 8)        // ÉÏÒç³ö¡£
+#define set_UE() (I387.swd |= 16)       // ÏÂÒç³ö¡£
+#define set_PE() (I387.swd |= 32)       // ¾«¶È¡£
 
-// ä¸‹é¢å®å®šä¹‰ç”¨äºè®¾ç½®çŠ¶æ€å­—ä¸­æ¡ä»¶æ ‡å¿—ä½C0ã€C1ã€C2å’ŒC3ã€‚
+// ÏÂÃæºê¶¨ÒåÓÃÓÚÉèÖÃ×´Ì¬×ÖÖĞÌõ¼ş±êÖ¾Î»C0¡¢C1¡¢C2ºÍC3¡£
 #define set_C0() (I387.swd |= 0x0100)
 #define set_C1() (I387.swd |= 0x0200)
 #define set_C2() (I387.swd |= 0x0400)
@@ -185,8 +185,9 @@ void fdiv(const temp_real *, const temp_real *, temp_real *);
 
 /* compare.c */
 
-void fcom(const temp_real *, const temp_real *);        // ä»¿çœŸæµ®ç‚¹æŒ‡ä»¤FTSTã€‚
+void fcom(const temp_real *, const temp_real *);        // ·ÂÕæ¸¡µãÖ¸ÁîFTST¡£
 void fucom(const temp_real *, const temp_real *);
 void ftst(const temp_real *);
 
 #endif
+

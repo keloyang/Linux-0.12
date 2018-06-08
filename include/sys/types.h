@@ -3,12 +3,12 @@
 
 #ifndef _SIZE_T
 #define _SIZE_T
-typedef unsigned int size_t;    // ç”¨äºå¯¹è±¡çš„å¤§å°ï¼ˆé•¿åº¦ï¼‰ã€‚
+typedef unsigned int size_t;    // ÓÃÓÚ¶ÔÏóµÄ´óĞ¡£¨³¤¶È£©¡£
 #endif
 
 #ifndef _TIME_T
 #define _TIME_T
-typedef long time_t;	// ç”¨äºæ—¶é—´(ä»¥ç§’è®¡)
+typedef long time_t;	// ÓÃÓÚÊ±¼ä(ÒÔÃë¼Æ)
 #endif
 
 #ifndef _PTRDIFF_T
@@ -20,18 +20,18 @@ typedef long ptrdiff_t;
 #define NULL ((void *) 0)
 #endif
 
-typedef int pid_t;	// ç”¨äºè¿›ç¨‹å·å’Œè¿›ç¨‹ç»„å·
-typedef unsigned short uid_t;	// ç”¨äºç”¨æˆ·å·(ç”¨æˆ·æ ‡è¯†å·)
-typedef unsigned short gid_t;	// ç”¨äºç»„å·
-typedef unsigned short dev_t;	// ç”¨äºè®¾å¤‡å·
-typedef unsigned short ino_t;	// ç”¨äºæ–‡ä»¶åºåˆ—å·
-typedef unsigned short mode_t;	// ç”¨äºæŸäº›æ–‡ä»¶å±æ€§
+typedef int pid_t;	// ÓÃÓÚ½ø³ÌºÅºÍ½ø³Ì×éºÅ
+typedef unsigned short uid_t;	// ÓÃÓÚÓÃ»§ºÅ(ÓÃ»§±êÊ¶ºÅ)
+typedef unsigned short gid_t;	// ÓÃÓÚ×éºÅ
+typedef unsigned short dev_t;	// ÓÃÓÚÉè±¸ºÅ
+typedef unsigned short ino_t;	// ÓÃÓÚÎÄ¼şĞòÁĞºÅ
+typedef unsigned short mode_t;	// ÓÃÓÚÄ³Ğ©ÎÄ¼şÊôĞÔ
 typedef unsigned short umode_t;
-typedef unsigned char nlink_t;	// ç”¨äºé“¾æ¥è®¡æ•°
+typedef unsigned char nlink_t;	// ÓÃÓÚÁ´½Ó¼ÆÊı
 typedef int daddr_t;
-typedef long off_t;             // ç”¨äºæ–‡ä»¶é•¿åº¦(å¤§å°).
-typedef unsigned char u_char;   // æ— ç¬¦å·å­—ç¬¦ç±»å‹ã€‚
-typedef unsigned short ushort;  // æ— ç¬¦å·çŸ­æ•´å‹ç±»å‹ã€‚
+typedef long off_t;             // ÓÃÓÚÎÄ¼ş³¤¶È(´óĞ¡).
+typedef unsigned char u_char;   // ÎŞ·ûºÅ×Ö·ûÀàĞÍ¡£
+typedef unsigned short ushort;  // ÎŞ·ûºÅ¶ÌÕûĞÍÀàĞÍ¡£
 
 typedef unsigned char cc_t;
 typedef unsigned int speed_t;
@@ -39,15 +39,16 @@ typedef unsigned long tcflag_t;
 
 typedef unsigned long fd_set;
 
-typedef struct { int quot,rem; } div_t;         // ç”¨äºDIVæ“ä½œã€‚
-typedef struct { long quot,rem; } ldiv_t;       // ç”¨äºé•¿DIVæ“ä½œã€‚
+typedef struct { int quot,rem; } div_t;         // ÓÃÓÚDIV²Ù×÷¡£
+typedef struct { long quot,rem; } ldiv_t;       // ÓÃÓÚ³¤DIV²Ù×÷¡£
 
-// æ–‡ä»¶ç³»ç»Ÿå‚æ•°ç»“æ„ï¼Œç”¨äºustat()å‡½æ•°ã€‚æœ€åä¸¤ä¸ªå­—æ®µæœªä½¿ç”¨ï¼Œæ€»æ˜¯è¿”å›NULLæŒ‡é’ˆã€‚
+// ÎÄ¼şÏµÍ³²ÎÊı½á¹¹£¬ÓÃÓÚustat()º¯Êı¡£×îºóÁ½¸ö×Ö¶ÎÎ´Ê¹ÓÃ£¬×ÜÊÇ·µ»ØNULLÖ¸Õë¡£
 struct ustat {
-	daddr_t f_tfree;        // ç³»ç»Ÿæ€»ç©ºé—²å—æ•°ã€‚
-	ino_t f_tinode;         // æ€»ç©ºé—²ièŠ‚ç‚¹æ•°ã€‚
-	char f_fname[6];        // æ–‡ä»¶ç³»ç»Ÿåç§°ã€‚
-	char f_fpack[6];        // æ–‡ä»¶ç³»ç»Ÿå‹ç¼©åç§°ã€‚
+	daddr_t f_tfree;        // ÏµÍ³×Ü¿ÕÏĞ¿éÊı¡£
+	ino_t f_tinode;         // ×Ü¿ÕÏĞi½ÚµãÊı¡£
+	char f_fname[6];        // ÎÄ¼şÏµÍ³Ãû³Æ¡£
+	char f_fpack[6];        // ÎÄ¼şÏµÍ³Ñ¹ËõÃû³Æ¡£
 };
 
 #endif
+

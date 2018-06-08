@@ -3,7 +3,7 @@ include ../Makefile.header
 LDFLAGS	+= -Ttext 0
 CPP_DISPLAY	+= -I../include
 
-## 鐩爣: all
+## 目标: all
 all: bootsect
 
 bootsect.s: bootsect.S ../include/linux/config.h
@@ -23,7 +23,9 @@ setup: setup.s
 head.o: head.s
 	@$(AS) -o head.o head.s
 	
-#### 娓呯悊鐩爣灏嗕細鍒犻櫎鎵�鏈夌敓鎴愮殑鏂囦欢 ####
+#### 清理目标将会删除所有生成的文件 ####
 clean:
 	@rm -f bootsect bootsect.o bootsect.s setup setup.o setup.s head.o
+
+
 

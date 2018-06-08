@@ -8,12 +8,12 @@
  * temporary real multiplication routine.
  */
 /*
- * 临时实数乘法子程序。
+ * ��ʱʵ���˷��ӳ���
  */
 
 #include <linux/math_emu.h>
 
-// 把c指针处的16字节值左移1位（乘2）。
+// ��cָ�봦��16�ֽ�ֵ����1λ����2����
 static void shift(int * c)
 {
 	__asm__("movl (%0),%%eax ; addl %%eax,(%0)\n\t"
@@ -23,55 +23,55 @@ static void shift(int * c)
 		::"r" ((long) c):"ax");
 }
 
-// 2个临时实数相乘，结果放在c指针处（16字节）。
+// 2����ʱʵ����ˣ��������cָ�봦��16�ֽڣ���
 static void mul64(const temp_real * a, const temp_real * b, int * c)
 {
-	__asm__("movl (%0),%%eax\n\t"           // 取a->a的值到eax。
-		"mull (%1)\n\t"                 // 与b->a的值相乘。
-		"movl %%eax,(%2)\n\t"           // 乘积的低位放入c[0]。
-		"movl %%edx,4(%2)\n\t"          // 乘积的高位放入c[1]。
-		"movl 4(%0),%%eax\n\t"          // 取a->b的值到eax。
-		"mull 4(%1)\n\t"                // 与b->b的值相乘。
-		"movl %%eax,8(%2)\n\t"          // 乘积的低位放入c[2]。
-		"movl %%edx,12(%2)\n\t"         // 乘积的高低放入c[3]。
-		"movl (%0),%%eax\n\t"           // 取a->a的值到eax。
-		"mull 4(%1)\n\t"                // 与b->b的值相乘。
-		"addl %%eax,4(%2)\n\t"          // 乘积的低位与c[1]相加放入c[1]。
-		"adcl %%edx,8(%2)\n\t"          // 乘积的高位与c[2]相加再加进位，然后放入a[2]。
-		"adcl $0,12(%2)\n\t"            // 把0与c[3]相加再加进位，然后放入c[3]。
-		"movl 4(%0),%%eax\n\t"          // 取a->b的值到eax。
-		"mull (%1)\n\t"                 // 与b->a的值相乘。
-		"addl %%eax,4(%2)\n\t"          // 乘积的低位与c[1]相加放入c[1]。
-		"adcl %%edx,8(%2)\n\t"          // 乘积的高位与c[2]相加再加进位，然后放入a[2]。
-		"adcl $0,12(%2)"                // 把0与c[3]相加再加进位，然后放入c[3]。
+	__asm__("movl (%0),%%eax\n\t"           // ȡa->a��ֵ��eax��
+		"mull (%1)\n\t"                 // ��b->a��ֵ��ˡ�
+		"movl %%eax,(%2)\n\t"           // �˻��ĵ�λ����c[0]��
+		"movl %%edx,4(%2)\n\t"          // �˻��ĸ�λ����c[1]��
+		"movl 4(%0),%%eax\n\t"          // ȡa->b��ֵ��eax��
+		"mull 4(%1)\n\t"                // ��b->b��ֵ��ˡ�
+		"movl %%eax,8(%2)\n\t"          // �˻��ĵ�λ����c[2]��
+		"movl %%edx,12(%2)\n\t"         // �˻��ĸߵͷ���c[3]��
+		"movl (%0),%%eax\n\t"           // ȡa->a��ֵ��eax��
+		"mull 4(%1)\n\t"                // ��b->b��ֵ��ˡ�
+		"addl %%eax,4(%2)\n\t"          // �˻��ĵ�λ��c[1]��ӷ���c[1]��
+		"adcl %%edx,8(%2)\n\t"          // �˻��ĸ�λ��c[2]����ټӽ�λ��Ȼ�����a[2]��
+		"adcl $0,12(%2)\n\t"            // ��0��c[3]����ټӽ�λ��Ȼ�����c[3]��
+		"movl 4(%0),%%eax\n\t"          // ȡa->b��ֵ��eax��
+		"mull (%1)\n\t"                 // ��b->a��ֵ��ˡ�
+		"addl %%eax,4(%2)\n\t"          // �˻��ĵ�λ��c[1]��ӷ���c[1]��
+		"adcl %%edx,8(%2)\n\t"          // �˻��ĸ�λ��c[2]����ټӽ�λ��Ȼ�����a[2]��
+		"adcl $0,12(%2)"                // ��0��c[3]����ټӽ�λ��Ȼ�����c[3]��
 		::"b" ((long) a),"c" ((long) b),"D" ((long) c)
 		:"ax","dx");
 }
 
-// 仿真浮点指令FMUL。
-// 临时实数src1 * src2 -> result处。
+// ���渡��ָ��FMUL��
+// ��ʱʵ��src1 * src2 -> result����
 void fmul(const temp_real * src1, const temp_real * src2, temp_real * result)
 {
 	int i,sign;
 	int tmp[4] = {0,0,0,0};
 
-// 首先确定两数相乘的符号。符号值等于两者符号位异或值。然后计算乘后的指数值。相乘时指数值需要相加。但是由于指数使用偏置
-// 格式保存，两个数的指数相加时偏置量也被加了两次，因此需要减掉一个偏置量值（临时实数的偏置量是16383）。
+// ����ȷ��������˵ķ��š�����ֵ�������߷���λ���ֵ��Ȼ�����˺��ָ��ֵ�����ʱָ��ֵ��Ҫ��ӡ���������ָ��ʹ��ƫ��
+// ��ʽ���棬��������ָ�����ʱƫ����Ҳ���������Σ������Ҫ����һ��ƫ����ֵ����ʱʵ����ƫ������16383����
 	sign = (src1->exponent ^ src2->exponent) & 0x8000;
 	i = (src1->exponent & 0x7fff) + (src2->exponent & 0x7fff) - 16383 + 1;
-// 如果结果指数变成了负值，表示两数相乘后产生下溢。于是直接返回带符号的零值。如果结果指数大于0x7fff，表示产生上溢，于是
-// 设置状态字溢出异常标志位，并返回。
+// ������ָ������˸�ֵ����ʾ������˺�������硣����ֱ�ӷ��ش����ŵ���ֵ��������ָ������0x7fff����ʾ�������磬����
+// ����״̬������쳣��־λ�������ء�
 	if (i<0) {
 		result->exponent = sign;
 		result->a = result->b = 0;
 		return;
 	}
 	if (i>0x7fff) {
-		set_OE();       // 置位溢出标志位。
+		set_OE();       // ��λ�����־λ��
 		return;
 	}
-// 如果两数尾数相乘后结果不为0，则对结果尾数进行规格化处理。即左移结果尾数值，使得最高有效位为1。同时相应地调整指数值。如果
-// 两数相乘后16字节的结尾数为0，则也设置指数值为0。最后把相乘结果保存在临时实数变量result中。
+// �������β����˺�����Ϊ0����Խ��β�����й�񻯴����������ƽ��β��ֵ��ʹ�������ЧλΪ1��ͬʱ��Ӧ�ص���ָ��ֵ�����
+// ������˺�16�ֽڵĽ�β��Ϊ0����Ҳ����ָ��ֵΪ0��������˽����������ʱʵ������result�С�
 	mul64(src1,src2,tmp);
 	if (tmp[0] || tmp[1] || tmp[2] || tmp[3])
 		while (i && tmp[3] >= 0) {
@@ -84,4 +84,5 @@ void fmul(const temp_real * src1, const temp_real * src2, temp_real * result)
 	result->a = tmp[2];
 	result->b = tmp[3];
 }
+
 

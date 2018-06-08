@@ -4,13 +4,13 @@
  * a ques).
  */
 /*
- * æœ¬æ–‡ä»¶å«æœ‰ä¸€äº›ATç¡¬ç›˜æ§åˆ¶å™¨çš„å®šä¹‰.æ¥è‡ªå„ç§èµ„æ–™.è¯·æŸ¥è¯æŸäº›å®šä¹‰(å¸¦æœ‰é—®å·çš„æ³¨é‡Š).
+ * ±¾ÎÄ¼şº¬ÓĞÒ»Ğ©ATÓ²ÅÌ¿ØÖÆÆ÷µÄ¶¨Òå.À´×Ô¸÷ÖÖ×ÊÁÏ.Çë²éÖ¤Ä³Ğ©¶¨Òå(´øÓĞÎÊºÅµÄ×¢ÊÍ).
  */
 #ifndef _HDREG_H
 #define _HDREG_H
 
 /* Hd controller regs. Ref: IBM AT Bios-listing */
-/* ç¡¬ç›˜æ§åˆ¶å™¨å¯„å­˜å™¨ç«¯å£. */
+/* Ó²ÅÌ¿ØÖÆÆ÷¼Ä´æÆ÷¶Ë¿Ú. */
 #define HD_DATA		0x1f0			/* _CTL when writing */
 #define HD_ERROR	0x1f1			/* see err-bits */
 #define HD_NSECTOR	0x1f2			/* nr of sectors to read/write */
@@ -22,45 +22,45 @@
 #define HD_PRECOMP HD_ERROR			/* same io address, read=error, write=precomp */
 #define HD_COMMAND HD_STATUS		/* same io address, read=status, write=cmd */
 
-#define HD_CMD		0x3f6			// æ§åˆ¶å¯„å­˜å™¨ç«¯å£
+#define HD_CMD		0x3f6			// ¿ØÖÆ¼Ä´æÆ÷¶Ë¿Ú
 
 /* Bits of HD_STATUS */
-/* ç¡¬ç›˜çŠ¶æ€å¯„å­˜å™¨å„ä½çš„å®šä¹‰(HD_STATUS) */
-#define ERR_STAT	0x01			// å‘½ä»¤æ‰§è¡Œé”™è¯¯.
-#define INDEX_STAT	0x02			// æ”¶åˆ°ç´¢å¼•.
-#define ECC_STAT	0x04			/* Corrected error */	// ECCæ ¡éªŒé”™.
-#define DRQ_STAT	0x08			// è¯·æ±‚æœåŠ¡.
-#define SEEK_STAT	0x10			// å¯»é“ç»“æŸ.
-#define WRERR_STAT	0x20			// é©±åŠ¨å™¨æ•…éšœ.
-#define READY_STAT	0x40			// é©±åŠ¨å™¨å‡†å¤‡å¥½(å°±ç»ª).
-#define BUSY_STAT	0x80			// æ§åˆ¶å™¨å¿™ç¢Œ.
+/* Ó²ÅÌ×´Ì¬¼Ä´æÆ÷¸÷Î»µÄ¶¨Òå(HD_STATUS) */
+#define ERR_STAT	0x01			// ÃüÁîÖ´ĞĞ´íÎó.
+#define INDEX_STAT	0x02			// ÊÕµ½Ë÷Òı.
+#define ECC_STAT	0x04			/* Corrected error */	// ECCĞ£Ñé´í.
+#define DRQ_STAT	0x08			// ÇëÇó·şÎñ.
+#define SEEK_STAT	0x10			// Ñ°µÀ½áÊø.
+#define WRERR_STAT	0x20			// Çı¶¯Æ÷¹ÊÕÏ.
+#define READY_STAT	0x40			// Çı¶¯Æ÷×¼±¸ºÃ(¾ÍĞ÷).
+#define BUSY_STAT	0x80			// ¿ØÖÆÆ÷Ã¦Âµ.
 
 /* Values for HD_COMMAND */
-/* ç¡¬ç›˜å‘½ä»¤å€¼(HD_CMD) */
-#define WIN_RESTORE		0x10		// é©±åŠ¨å™¨é‡æ–°æ ¡æ­£(é©±åŠ¨å™¨å¤ä½).
-#define WIN_READ		0x20		// è¯»æ‰‡åŒº
-#define WIN_WRITE		0x30		// å†™æ‰‡åŒº
-#define WIN_VERIFY		0x40		// æ‰‡åŒºæ£€éªŒ
-#define WIN_FORMAT		0x50		// æ ¼å¼åŒ–ç£é“
-#define WIN_INIT		0x60		// æ§åˆ¶å™¨åˆå§‹åŒ–
-#define WIN_SEEK 		0x70		// å¯»é“
-#define WIN_DIAGNOSE	0x90		// æ§åˆ¶å™¨è¯Šæ–­
-#define WIN_SPECIFY		0x91		// å»ºç«‹é©±åŠ¨å™¨å‚æ•°
+/* Ó²ÅÌÃüÁîÖµ(HD_CMD) */
+#define WIN_RESTORE		0x10		// Çı¶¯Æ÷ÖØĞÂĞ£Õı(Çı¶¯Æ÷¸´Î»).
+#define WIN_READ		0x20		// ¶ÁÉÈÇø
+#define WIN_WRITE		0x30		// Ğ´ÉÈÇø
+#define WIN_VERIFY		0x40		// ÉÈÇø¼ìÑé
+#define WIN_FORMAT		0x50		// ¸ñÊ½»¯´ÅµÀ
+#define WIN_INIT		0x60		// ¿ØÖÆÆ÷³õÊ¼»¯
+#define WIN_SEEK 		0x70		// Ñ°µÀ
+#define WIN_DIAGNOSE	0x90		// ¿ØÖÆÆ÷Õï¶Ï
+#define WIN_SPECIFY		0x91		// ½¨Á¢Çı¶¯Æ÷²ÎÊı
 
 /* Bits for HD_ERROR */
-/* é”™è¯¯å¯„å­˜å™¨å„ä½çš„å«ä¹‰(HD_ERROR) */
-// æ‰§è¡Œæ§åˆ¶å™¨è¯Šæ–­æ—¶å«ä¹‰ä¸å…¶ä»–å‘½ä»¤æ—¶çš„ä¸åŒ.ä¸‹é¢åˆ†åˆ«åˆ—å‡º:
+/* ´íÎó¼Ä´æÆ÷¸÷Î»µÄº¬Òå(HD_ERROR) */
+// Ö´ĞĞ¿ØÖÆÆ÷Õï¶ÏÊ±º¬ÒåÓëÆäËûÃüÁîÊ±µÄ²»Í¬.ÏÂÃæ·Ö±ğÁĞ³ö:
 // ============================================================
-//        è¯Šæ–­å‘½ä»¤æ—¶                å…¶ä»–å‘½ä»¤æ—¶
+//        Õï¶ÏÃüÁîÊ±                ÆäËûÃüÁîÊ±
 // ------------------------------------------------------------
-// 0x01     æ— é”™è¯¯                æ•°æ®æ ‡å¿—ä¸¢å¤±
-// 0x02     æ§åˆ¶å™¨å‡ºé”™             ç£é“0é”™
-// 0x03     æ‰‡åŒºç¼“å†²åŒºé”™
-// 0x04     ECCéƒ¨ä»¶é”™             å‘½ä»¤æ”¾å¼ƒ
-// 0x05     æ§åˆ¶å¤„ç†å™¨é”™
-// 0x10                          IDæœªæ‰¾åˆ°
-// 0x40                          ECCé”™è¯¯
-// 0x80                          åæ‰‡åŒº
+// 0x01     ÎŞ´íÎó                Êı¾İ±êÖ¾¶ªÊ§
+// 0x02     ¿ØÖÆÆ÷³ö´í             ´ÅµÀ0´í
+// 0x03     ÉÈÇø»º³åÇø´í
+// 0x04     ECC²¿¼ş´í             ÃüÁî·ÅÆú
+// 0x05     ¿ØÖÆ´¦ÀíÆ÷´í
+// 0x10                          IDÎ´ÕÒµ½
+// 0x40                          ECC´íÎó
+// 0x80                          »µÉÈÇø
 // ------------------------------------------------------------
 #define MARK_ERR	0x01	/* Bad address mark ? */
 #define TRK0_ERR	0x02	/* couldn't find track 0 */
@@ -69,7 +69,7 @@
 #define ECC_ERR		0x40	/* ? */
 #define	BBD_ERR		0x80	/* ? */
 
-// ç¡¬ç›˜åˆ†åŒºè¡¨ç»“æ„.
+// Ó²ÅÌ·ÖÇø±í½á¹¹.
 struct partition {
 	unsigned char boot_ind;		/* 0x80 - active (unused) */
 	unsigned char head;		/* ? */
@@ -84,3 +84,4 @@ struct partition {
 };
 
 #endif
+

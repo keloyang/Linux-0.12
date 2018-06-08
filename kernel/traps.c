@@ -10,45 +10,45 @@
  * to mainly kill the offending process (probably by giving it a signal,
  * but possibly by killing it outright if necessary).
  */
-/* åœ¨ç¨‹åºasm.sä¸­ä¿å­˜äº†ä¸€äº›çŠ¶æ€å,æœ¬ç¨‹åºç”¨æ¥å¤„ç†ç¡¬ä»¶é™·é˜±å’Œæ•…éšœ.ç›®å‰ä¸»è¦ç”¨äºè°ƒè¯•ç›®çš„,ä»¥åå°†æ‰©å±•ç”¨æ¥æ€æ­»é­æŸåçš„è¿›ç¨‹(ä¸»æ˜¯é€šè¿‡å‘é€ä¸€ä¸ªä¿¡å·,
- * ä½†å¦‚æœå¿…è¦ä¹Ÿä¼šç›´æ¥æ€æ­».
+/* ÔÚ³ÌĞòasm.sÖĞ±£´æÁËÒ»Ğ©×´Ì¬ºó,±¾³ÌĞòÓÃÀ´´¦ÀíÓ²¼şÏİÚåºÍ¹ÊÕÏ.Ä¿Ç°Ö÷ÒªÓÃÓÚµ÷ÊÔÄ¿µÄ,ÒÔºó½«À©Õ¹ÓÃÀ´É±ËÀÔâËğ»µµÄ½ø³Ì(Ö÷ÊÇÍ¨¹ı·¢ËÍÒ»¸öĞÅºÅ,
+ * µ«Èç¹û±ØÒªÒ²»áÖ±½ÓÉ±ËÀ.
  */
 // #include <string.h>
 
 #include <linux/head.h>
-#include <linux/sched.h>				// è°ƒåº¦ç¨‹åºå¤´æ–‡ä»¶,å®šä¹‰äº†ä»»åŠ¡ç»“æ„task_struct,åˆå§‹ä»»åŠ¡0çš„æ•°æ®.
+#include <linux/sched.h>				// µ÷¶È³ÌĞòÍ·ÎÄ¼ş,¶¨ÒåÁËÈÎÎñ½á¹¹task_struct,³õÊ¼ÈÎÎñ0µÄÊı¾İ.
 #include <linux/kernel.h>
-#include <asm/system.h>					// ç³»ç»Ÿå¤´æ–‡ä»¶.å®šä¹‰äº†è®¾ç½®æˆ–ä¿®æ”¹æè¿°ç¬¦/ä¸­æ–­é—¨ç­‰çš„åµŒå…¥å¼æ±‡ç¼–å®.
+#include <asm/system.h>					// ÏµÍ³Í·ÎÄ¼ş.¶¨ÒåÁËÉèÖÃ»òĞŞ¸ÄÃèÊö·û/ÖĞ¶ÏÃÅµÈµÄÇ¶ÈëÊ½»ã±àºê.
 #include <asm/segment.h>
-#include <asm/io.h>						// è¾“å…¥/è¾“å‡ºå¤´æ–‡ä»¶.å®šä¹‰ç¡¬ä»¶ç«¯å£è¾“å…¥/è¾“å‡ºå®æ±‡ç¼–è¯­å¥.
+#include <asm/io.h>						// ÊäÈë/Êä³öÍ·ÎÄ¼ş.¶¨ÒåÓ²¼ş¶Ë¿ÚÊäÈë/Êä³öºê»ã±àÓï¾ä.
 
-// å–segä¸­åœ°å€addrå¤„çš„ä¸€ä¸ªå­—èŠ‚.
-// å‚æ•°: seg - æ®µé€‰æ‹©ç¬¦;addr - æ®µå†…æŒ‡å®šåœ°å€.
-// è¾“å‡º: %0 - eax(__res);è¾“å…¥: %1 - eax(seg); %2 - å†…å­˜åœ°å€(*(addr))
+// È¡segÖĞµØÖ·addr´¦µÄÒ»¸ö×Ö½Ú.
+// ²ÎÊı: seg - ¶ÎÑ¡Ôñ·û;addr - ¶ÎÄÚÖ¸¶¨µØÖ·.
+// Êä³ö: %0 - eax(__res);ÊäÈë: %1 - eax(seg); %2 - ÄÚ´æµØÖ·(*(addr))
 #define get_seg_byte(seg, addr) ({ \
 register char __res; \
 __asm__("push %%fs;mov %%ax,%%fs;movb %%fs:%2,%%al;pop %%fs" \
 	:"=a" (__res):"0" (seg),"m" (*(addr))); \
 __res;})
 
-// å–segä¸­åœ°å€addrå¤„çš„ä¸€ä¸ªé•¿å­—(4å­—èŠ‚).
-// å‚æ•°: seg - æ®µé€‰æ‹©ç¬¦;addr - æ®µå†…æŒ‡å®šåœ°å€.
-// è¾“å‡º: %0 - eax(__res);è¾“å…¥: %1 - eax(seg); %2 - å†…å­˜åœ°å€(*(addr))
+// È¡segÖĞµØÖ·addr´¦µÄÒ»¸ö³¤×Ö(4×Ö½Ú).
+// ²ÎÊı: seg - ¶ÎÑ¡Ôñ·û;addr - ¶ÎÄÚÖ¸¶¨µØÖ·.
+// Êä³ö: %0 - eax(__res);ÊäÈë: %1 - eax(seg); %2 - ÄÚ´æµØÖ·(*(addr))
 #define get_seg_long(seg, addr) ({ \
 register unsigned long __res; \
 __asm__("push %%fs;mov %%ax,%%fs;movl %%fs:%2,%%eax;pop %%fs" \
 	:"=a" (__res):"0" (seg),"m" (*(addr))); \
 __res;})
 
-// å–fsæ®µå¯„å­˜å™¨çš„å€¼(é€‰æ‹©ç¬¦).
-// è¾“å‡º:%0 - eax(__res)
+// È¡fs¶Î¼Ä´æÆ÷µÄÖµ(Ñ¡Ôñ·û).
+// Êä³ö:%0 - eax(__res)
 #define _fs() ({ \
 register unsigned short __res; \
 __asm__("mov %%fs,%%ax":"=a" (__res):); \
 __res;})
 
-// ä»¥ä¸‹å®šä¹‰äº†ä¸€äº›å‡½æ•°åŸå‹.
-void page_exception(void);					// é¡µå¼‚å¸¸.å®é™…æ˜¯page_fault(mm/page.s)
+// ÒÔÏÂ¶¨ÒåÁËÒ»Ğ©º¯ÊıÔ­ĞÍ.
+void page_exception(void);					// Ò³Òì³£.Êµ¼ÊÊÇpage_fault(mm/page.s)
 
 void divide_error(void);					// int0(kernel/asm.s)
 void debug(void);							// int1(kernel/asm.s)
@@ -68,41 +68,41 @@ void page_fault(void);						// int14(mm/page.s)
 void coprocessor_error(void);				// int16(kernel/sys_call.s)
 void reserved(void);						// int15(kernel/asm.s)
 void parallel_interrupt(void);				// int39(kernel/sys_call.s)
-void irq13(void);							// int45åå¤„ç†å™¨ä¸­æ–­å¤„ç†(kernel/asm.s)
+void irq13(void);							// int45Ğ­´¦ÀíÆ÷ÖĞ¶Ï´¦Àí(kernel/asm.s)
 void alignment_check(void);					// int46(kernel/asm.s)
 
-// è¯¥å­ç¨‹åºç”¨æ¥æ‰“å°å‡ºé”™ä¸­æ–­çš„åç§°,å‡ºé”™å·,è°ƒç”¨ç¨‹åºçš„EIP,EFLAGS,ESP,fsæ®µå¯„å­˜å™¨å€¼,æ®µçš„åŸºå€,æ®µçš„é•¿åº¦,è¿›ç¨‹å·pid,ä»»åŠ¡å·,10å­—èŠ‚æŒ‡ä»¤ç .å¦‚æœ
-// å †æ ˆåœ¨ç”¨æˆ·æ•°æ®æ®µ,åˆ™è¿˜æ‰“å°16å­—èŠ‚å †æ ˆå†…å®¹.è¿™äº›ä¿¡æ¯å¯ç”¨äºç¨‹åºè°ƒè¯•.
+// ¸Ã×Ó³ÌĞòÓÃÀ´´òÓ¡³ö´íÖĞ¶ÏµÄÃû³Æ,³ö´íºÅ,µ÷ÓÃ³ÌĞòµÄEIP,EFLAGS,ESP,fs¶Î¼Ä´æÆ÷Öµ,¶ÎµÄ»ùÖ·,¶ÎµÄ³¤¶È,½ø³ÌºÅpid,ÈÎÎñºÅ,10×Ö½ÚÖ¸ÁîÂë.Èç¹û
+// ¶ÑÕ»ÔÚÓÃ»§Êı¾İ¶Î,Ôò»¹´òÓ¡16×Ö½Ú¶ÑÕ»ÄÚÈİ.ÕâĞ©ĞÅÏ¢¿ÉÓÃÓÚ³ÌĞòµ÷ÊÔ.
 static void die(char * str, long esp_ptr, long nr)
 {
 	long * esp = (long *) esp_ptr;
 	int i;
 
 	printk("%s: %04x\n\r",str, nr & 0xffff);
-	// ä¸‹è¡Œæ‰“å°è¯­å¥æ˜¾ç¤ºå½“å‰è°ƒç”¨è¿›ç¨‹çš„CS:EIP,EFLAGSå’ŒSS:ESPçš„å€¼.
-	// (1) EIP:\t%04x:%p\n	-- esp[1]æ˜¯æ®µé€‰æ‹©ç¬¦(cs),esp[0]æ˜¯eip
-	// (2) EFLAGS:\t%p	-- esp[2]æ˜¯eflags
-	// (2) ESP:\t%04x:%p\n	-- esp[4]æ˜¯åŸss,esp[3]æ˜¯åŸesp
+	// ÏÂĞĞ´òÓ¡Óï¾äÏÔÊ¾µ±Ç°µ÷ÓÃ½ø³ÌµÄCS:EIP,EFLAGSºÍSS:ESPµÄÖµ.
+	// (1) EIP:\t%04x:%p\n	-- esp[1]ÊÇ¶ÎÑ¡Ôñ·û(cs),esp[0]ÊÇeip
+	// (2) EFLAGS:\t%p	-- esp[2]ÊÇeflags
+	// (2) ESP:\t%04x:%p\n	-- esp[4]ÊÇÔ­ss,esp[3]ÊÇÔ­esp
 	printk("EIP:\t%04x:%p\nEFLAGS:\t%p\nESP:\t%04x:%p\n",
 		esp[1], esp[0], esp[2], esp[4], esp[3]);
 	printk("fs: %04x\n", _fs());
 	printk("base: %p, limit: %p\n", get_base(current->ldt[1]), get_limit(0x17));
-	if (esp[4] == 0x17) {						// æˆ–åŸsså€¼ä¸º0x17(ç”¨æˆ·æ ˆ),åˆ™è¿˜æ‰“å°å‡ºç”¨æˆ·æ ˆçš„4ä¸ªé•¿å­—å€¼(16å­—èŠ‚).
+	if (esp[4] == 0x17) {						// »òÔ­ssÖµÎª0x17(ÓÃ»§Õ»),Ôò»¹´òÓ¡³öÓÃ»§Õ»µÄ4¸ö³¤×ÖÖµ(16×Ö½Ú).
 		printk("Stack: ");
 		for (i = 0; i < 4; i++)
 			printk("%p ", get_seg_long(0x17, i + (long *)esp[3]));
 		printk("\n");
 	}
-	str(i);										// å–å½“å‰è¿è¡Œä»»åŠ¡çš„ä»»åŠ¡å·(include/linux/sched.h).
+	str(i);										// È¡µ±Ç°ÔËĞĞÈÎÎñµÄÈÎÎñºÅ(include/linux/sched.h).
 	printk("Pid: %d, process nr: %d\n\r", current->pid, 0xffff & i);
-                        						// è¿›ç¨‹å·,ä»»åŠ¡å·.
+                        						// ½ø³ÌºÅ,ÈÎÎñºÅ.
 	for(i = 0; i < 10; i++)
 		printk("%02x ", 0xff & get_seg_byte(esp[1], (i+(char *)esp[0])));
 	printk("\n\r");
 	do_exit(11);								/* play segment exception */
 }
 
-// ä»¥ä¸‹è¿™äº›ä»¥do_å¼€å¤´çš„å‡½æ•°æ˜¯asm.sä¸­å¯¹åº”ä¸­æ–­å¤„ç†ç¨‹åºè°ƒç”¨çš„Cå‡½æ•°.
+// ÒÔÏÂÕâĞ©ÒÔdo_¿ªÍ·µÄº¯ÊıÊÇasm.sÖĞ¶ÔÓ¦ÖĞ¶Ï´¦Àí³ÌĞòµ÷ÓÃµÄCº¯Êı.
 void do_double_fault(long esp, long error_code)
 {
 	die("double fault", esp, error_code);
@@ -123,7 +123,7 @@ void do_divide_error(long esp, long error_code)
 	die("divide error", esp, error_code);
 }
 
-// å‚æ•°æ˜¯è¿›å…¥ä¸­æ–­åè¢«é¡ºåºå‹å…¥å †æ ˆçš„å¯„å­˜å™¨å€¼.å‚è§asm.sç¨‹åº.
+// ²ÎÊıÊÇ½øÈëÖĞ¶Ïºó±»Ë³ĞòÑ¹Èë¶ÑÕ»µÄ¼Ä´æÆ÷Öµ.²Î¼ûasm.s³ÌĞò.
 void do_int3(long * esp, long error_code,
 		long fs, long es, long ds,
 		long ebp, long esi, long edi,
@@ -131,7 +131,7 @@ void do_int3(long * esp, long error_code,
 {
 	int tr;
 
-	__asm__("str %%ax":"=a" (tr):"0" (0));		// å–ä»»åŠ¡å¯„å­˜å™¨å€¼->tr
+	__asm__("str %%ax":"=a" (tr):"0" (0));		// È¡ÈÎÎñ¼Ä´æÆ÷Öµ->tr
 	printk("eax\t\tebx\t\tecx\t\tedx\n\r%8x\t%8x\t%8x\t%8x\n\r",
 		eax, ebx, ecx, edx);
 	printk("esi\t\tedi\t\tebp\t\tesp\n\r%8x\t%8x\t%8x\t%8x\n\r",
@@ -203,22 +203,22 @@ void do_reserved(long esp, long error_code)
 	die("reserved (15,17-47) error", esp, error_code);
 }
 
-// ä¸‹é¢æ˜¯å¼‚å¸¸(é™·é˜±)ä¸­æ–­ç¨‹åºåˆå§‹åŒ–å­ç¨‹åº.è®¾ç½®å®ƒä»¬çš„ä¸­æ–­è°ƒç”¨é—¨(ä¸­æ–­å‘é‡).
-// set_trap_gate()ä¸set_system_gate()éƒ½ä½¿ç”¨äº†ä¸­æ–­æè¿°ç¬¦è¡¨IDTä¸­çš„é™·é˜±é—¨(Trap Gate),å®ƒä»¬ä¹‹é—´çš„ä¸»è¦åŒºåˆ«åœ¨äºå‰è€…è®¾ç½®çš„ç‰¹æƒçº§ä¸º0,
-// åè€…æ˜¯3.å› æ­¤æ–­ç‚¹é™·é˜±ä¸­æ–­int3,æº¢å‡ºä¸­æ–­overflowå’Œè¾¹ç•Œå‡ºé”™ä¸­æ–­boundså¯ä»¥ç”±ä»»ä½•ç¨‹åºè°ƒç”¨.è¿™ä¸¤ä¸ªå‡½æ•°å‡æ˜¯åµŒå…¥å¼æ±‡ç¼–å®ç¨‹åº,å‚è§
+// ÏÂÃæÊÇÒì³£(ÏİÚå)ÖĞ¶Ï³ÌĞò³õÊ¼»¯×Ó³ÌĞò.ÉèÖÃËüÃÇµÄÖĞ¶Ïµ÷ÓÃÃÅ(ÖĞ¶ÏÏòÁ¿).
+// set_trap_gate()Óëset_system_gate()¶¼Ê¹ÓÃÁËÖĞ¶ÏÃèÊö·û±íIDTÖĞµÄÏİÚåÃÅ(Trap Gate),ËüÃÇÖ®¼äµÄÖ÷ÒªÇø±ğÔÚÓÚÇ°ÕßÉèÖÃµÄÌØÈ¨¼¶Îª0,
+// ºóÕßÊÇ3.Òò´Ë¶ÏµãÏİÚåÖĞ¶Ïint3,Òç³öÖĞ¶ÏoverflowºÍ±ß½ç³ö´íÖĞ¶Ïbounds¿ÉÒÔÓÉÈÎºÎ³ÌĞòµ÷ÓÃ.ÕâÁ½¸öº¯Êı¾ùÊÇÇ¶ÈëÊ½»ã±àºê³ÌĞò,²Î¼û
 // include/asm/system.h
 void trap_init(void)
 {
 	int i;
 
-	set_trap_gate(0, &divide_error);							// è®¾ç½®é™¤æ“ä½œå‡ºé”™çš„ä¸­æ–­å‘é‡å€¼.
+	set_trap_gate(0, &divide_error);							// ÉèÖÃ³ı²Ù×÷³ö´íµÄÖĞ¶ÏÏòÁ¿Öµ.
 	set_trap_gate(1, &debug);
 	set_trap_gate(2, &nmi);
 	set_system_gate(3, &int3);									/* int3-5 can be called from all */
 	set_system_gate(4, &overflow);
 	set_system_gate(5, &bounds);
 	set_trap_gate(6, &invalid_op);
-	set_trap_gate(7, &device_not_available);					// å‡½æ•°æœªå®ç°
+	set_trap_gate(7, &device_not_available);					// º¯ÊıÎ´ÊµÏÖ
 	set_trap_gate(8, &double_fault);
 	set_trap_gate(9, &coprocessor_segment_overrun);
 	set_trap_gate(10, &invalid_TSS);
@@ -227,14 +227,15 @@ void trap_init(void)
 	set_trap_gate(13, &general_protection);
 	set_trap_gate(14, &page_fault);
 	set_trap_gate(15, &reserved);
-	set_trap_gate(16, &coprocessor_error);						// å‡½æ•°æœªå®ç°
+	set_trap_gate(16, &coprocessor_error);						// º¯ÊıÎ´ÊµÏÖ
 	set_trap_gate(17, &alignment_check);
-	// ä¸‹é¢æŠŠint17-47çš„é™·é˜±é—¨å…ˆå‡è®¾ç½®ä¸ºreserved,ä»¥åå„ç¡¬ä»¶åˆå§‹åŒ–æ—¶ä¼šé‡æ–°è®¾ç½®è‡ªå·±çš„é™·é˜±é—¨.
+	// ÏÂÃæ°Ñint17-47µÄÏİÚåÃÅÏÈ¾ùÉèÖÃÎªreserved,ÒÔºó¸÷Ó²¼ş³õÊ¼»¯Ê±»áÖØĞÂÉèÖÃ×Ô¼ºµÄÏİÚåÃÅ.
 	for (i = 18; i < 48; i++)
 		set_trap_gate(i, &reserved);
-	// è®¾ç½®åå¤„ç†å™¨ä¸­æ–­0x2d(45)é™·é˜±é—¨æè¿°ç¬¦,å¹¶å…è®¸å…¶äº§ç”Ÿä¸­æ–­è¯·æ±‚.è®¾ç½®å¹¶è¡Œå£ä¸­æ–­æè¿°ç¬¦.
+	// ÉèÖÃĞ­´¦ÀíÆ÷ÖĞ¶Ï0x2d(45)ÏİÚåÃÅÃèÊö·û,²¢ÔÊĞíÆä²úÉúÖĞ¶ÏÇëÇó.ÉèÖÃ²¢ĞĞ¿ÚÖĞ¶ÏÃèÊö·û.
 	set_trap_gate(45, &irq13);
-	outb_p(inb_p(0x21)&0xfb, 0x21);								// å…è®¸8259Aä¸»èŠ¯ç‰‡çš„IRQ2ä¸­æ–­è¯·æ±‚(è¿æ¥ä»èŠ¯ç‰‡)
-	outb(inb_p(0xA1)&0xdf, 0xA1);								// å…è®¸8259Aä»èŠ¯ç‰‡çš„IRQ13ä¸­æ–­è¯·æ±‚(åå¤„ç†å™¨ä¸­æ–­)
-	set_trap_gate(39, &parallel_interrupt);						// è®¾ç½®å¹¶è¡Œå£1çš„ä¸­æ–­0x27é™·é˜±é—¨æè¿°ç¬¦.
+	outb_p(inb_p(0x21)&0xfb, 0x21);								// ÔÊĞí8259AÖ÷Ğ¾Æ¬µÄIRQ2ÖĞ¶ÏÇëÇó(Á¬½Ó´ÓĞ¾Æ¬)
+	outb(inb_p(0xA1)&0xdf, 0xA1);								// ÔÊĞí8259A´ÓĞ¾Æ¬µÄIRQ13ÖĞ¶ÏÇëÇó(Ğ­´¦ÀíÆ÷ÖĞ¶Ï)
+	set_trap_gate(39, &parallel_interrupt);						// ÉèÖÃ²¢ĞĞ¿Ú1µÄÖĞ¶Ï0x27ÏİÚåÃÅÃèÊö·û.
 }
+

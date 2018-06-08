@@ -15,7 +15,7 @@ CPP	+= -Iinclude
 #
 # ROOT_DEV specifies the default root-device when making the image.
 # This can be either FLOPPY, /dev/xxxx or empty, in which case the
-# default of /dev/hd6 is used by 'build'.
+# default of /dev/hd6 (第二块盘的第一个分区) is used by 'build'.
 #
 ROOT_DEV=0301
 SWAP_DEV=0304
@@ -41,10 +41,10 @@ Image: boot/bootsect boot/setup tools/system
 	@cp -f tools/system system.tmp
 	@strip system.tmp
 	@objcopy -O binary -R .note -R .comment system.tmp tools/kernel
-	@tools/build.sh boot/bootsect boot/setup tools/kernel Kernel_Image $(ROOT_DEV) $(SWAP_DEV)
+	@tools/build.sh boot/bootsect boot/setup tools/kernel Image $(ROOT_DEV) $(SWAP_DEV)
 	@rm system.tmp
 	@rm tools/kernel -f
-	@cp Kernel_Image ../linux-0.12-080324
+	
 	@sync
 
 boot/bootsect: boot/bootsect.S
@@ -98,11 +98,13 @@ clean:
 	@for i in mm fs kernel lib boot; do make clean -C $$i; done
 
 debug:
-	@qemu-system-i386 -m 32M -boot a -fda Image -fdb rootimage-0.12 -hda rootimage-0.12-hd \
+	@qemu-system-i386 -m 32M -boot a -fda Image -fdb rootimage-0.12-fd -hda rootimage-0.12-hd \
 	-serial pty -S -gdb tcp::1234
 
 start:
-	@qemu-system-i386 -m 32M -boot a -fda Image -fdb rootimage-0.12 -hda rootimage-0.12-hd
+	#@qemu-system-i386 -m 32M -boot a -fda Image -fdb rootimage-0.12-fd -hda rootimage-0.12-hd -curses
+	qemu-system-i386 -m 32M -kernel Image -append "rw console=ttyS0"  -fdb rootimage-0.12-fd -hda rootimage-0.12-hd -curses 
+
 
 dep:
 	@sed '/\#\#\# Dependencies/q' < Makefile > tmp_make

@@ -2,36 +2,36 @@
  * 'kernel.h' contains some often-used function prototypes etc
  */
 /*
- * 'kernel.h'å®šä¹‰äº†ä¸€äº›å†…æ ¸å¸¸ç”¨å‡½æ•°çš„åŸå‹ç­‰.
+ * 'kernel.h'¶¨ÒåÁËÒ»Ğ©ÄÚºË³£ÓÃº¯ÊıµÄÔ­ĞÍµÈ.
  */
 
-// éªŒè¯ç»™å®šåœ°å€å¼€å§‹çš„å†…åœ¨å—æ˜¯å¦è¶…é™ã€‚è‹¥è¶…é™åˆ™è¿½åŠ å†…å­˜ã€‚ï¼ˆkernel/fork.cï¼‰ã€‚
+// ÑéÖ¤¸ø¶¨µØÖ·¿ªÊ¼µÄÄÚÔÚ¿éÊÇ·ñ³¬ÏŞ¡£Èô³¬ÏŞÔò×·¼ÓÄÚ´æ¡££¨kernel/fork.c£©¡£
 void verify_area(void * addr,int count);
-void panic(const char * str);                   // æ˜¾ç¤ºå†…æ ¸å‡ºé”™ä¿¡æ¯,ç„¶åè¿›å…¥æ­»å¾ªç¯(kernel/panic.c)
-void do_exit(long error_code);                  // è¿›ç¨‹é€€å‡ºå¤„ç†ã€‚(kernel/exit.c)
-int printf(const char * fmt, ...);              // æ ‡å‡†æ‰“å°æ˜¾ç¤ºå‡½æ•°ã€‚ï¼ˆinit/main.cï¼‰
-int printk(const char * fmt, ...);              // å†…æ ¸ä¸“ç”¨çš„æ‰“å°ä¿¡æ¯å‡½æ•°ï¼ŒåŠŸèƒ½ä¸printf()ç›¸åŒã€‚(kernel/printk.c)
-void console_print(const char * str);           // æ§åˆ¶å°æ˜¾ç¤ºå‡½æ•°ã€‚(kernel/chr_drv/console.c)
-int tty_write(unsigned ch,char * buf,int count);// å¾€ttyä¸Šå†™æŒ‡å®šé•¿åº¦çš„å­—ç¬¦ä¸²ã€‚ï¼ˆkernel/chr_drv/tty_io.cï¼‰
-void * malloc(unsigned int size);               // é€šç”¨å†…æ ¸å†…å­˜åˆ†é…å‡½æ•°ã€‚ï¼ˆlib/malloc.cï¼‰
-void free_s(void * obj, int size);              // é‡Šæ”¾æŒ‡å®šå¯¹è±¡å ç”¨çš„å†…åœ¨ã€‚ï¼ˆlib/malloc.cï¼‰
-extern void hd_times_out(void);                 // ç¡¬ç›˜å¤„ç†è¶…æ—¶ã€‚ï¼ˆkernel/blk_drv/hd.cï¼‰
-extern void sysbeepstop(void);                  // åœæ­¢èœ‚é¸£ã€‚ï¼ˆkernel/chr_drv/console.cï¼‰
-extern void hd_times_out(void);                 // ç¡¬ç›˜å¤„ç†è¶…æ—¶(kernel/blk_drv/hd.c)
-extern void sysbeepstop(void);                  // åœæ­¢èœ‚é¸£(kernel/chr_drv/console.c)
-extern void blank_screen(void);                 // é»‘å±å¤„ç†.(kernel/chr_drv/console.c)
-extern void unblank_screen(void);               // æ¢å¤è¢«é»‘å±çš„å±å¹•.(kernel/chr_drv/console.c)
+void panic(const char * str);                   // ÏÔÊ¾ÄÚºË³ö´íĞÅÏ¢,È»ºó½øÈëËÀÑ­»·(kernel/panic.c)
+void do_exit(long error_code);                  // ½ø³ÌÍË³ö´¦Àí¡£(kernel/exit.c)
+int printf(const char * fmt, ...);              // ±ê×¼´òÓ¡ÏÔÊ¾º¯Êı¡££¨init/main.c£©
+int printk(const char * fmt, ...);              // ÄÚºË×¨ÓÃµÄ´òÓ¡ĞÅÏ¢º¯Êı£¬¹¦ÄÜÓëprintf()ÏàÍ¬¡£(kernel/printk.c)
+void console_print(const char * str);           // ¿ØÖÆÌ¨ÏÔÊ¾º¯Êı¡£(kernel/chr_drv/console.c)
+int tty_write(unsigned ch,char * buf,int count);// ÍùttyÉÏĞ´Ö¸¶¨³¤¶ÈµÄ×Ö·û´®¡££¨kernel/chr_drv/tty_io.c£©
+void * malloc(unsigned int size);               // Í¨ÓÃÄÚºËÄÚ´æ·ÖÅäº¯Êı¡££¨lib/malloc.c£©
+void free_s(void * obj, int size);              // ÊÍ·ÅÖ¸¶¨¶ÔÏóÕ¼ÓÃµÄÄÚÔÚ¡££¨lib/malloc.c£©
+extern void hd_times_out(void);                 // Ó²ÅÌ´¦Àí³¬Ê±¡££¨kernel/blk_drv/hd.c£©
+extern void sysbeepstop(void);                  // Í£Ö¹·äÃù¡££¨kernel/chr_drv/console.c£©
+extern void hd_times_out(void);                 // Ó²ÅÌ´¦Àí³¬Ê±(kernel/blk_drv/hd.c)
+extern void sysbeepstop(void);                  // Í£Ö¹·äÃù(kernel/chr_drv/console.c)
+extern void blank_screen(void);                 // ºÚÆÁ´¦Àí.(kernel/chr_drv/console.c)
+extern void unblank_screen(void);               // »Ö¸´±»ºÚÆÁµÄÆÁÄ».(kernel/chr_drv/console.c)
 
-extern int beepcount;		                    // èœ‚é¸£æ—¶é—´æ»´ç­”è®¡æ•°(kernel/chr_drv/console.c)
-extern int hd_timeout;		                    // ç¡¬ç›˜è¶…æ—¶æ»´ç­”å€¼(kernel/blk_drv/blk.h)
-extern int blankinterval;	                    // è®¾å®šçš„å±å¹•é»‘å±é—´éš”æ—¶é—´
-extern int blankcount;		                    // é»‘å±æ—¶é—´è®¡æ•°(kernel/chr_drv/console.c)
+extern int beepcount;		                    // ·äÃùÊ±¼äµÎ´ğ¼ÆÊı(kernel/chr_drv/console.c)
+extern int hd_timeout;		                    // Ó²ÅÌ³¬Ê±µÎ´ğÖµ(kernel/blk_drv/blk.h)
+extern int blankinterval;	                    // Éè¶¨µÄÆÁÄ»ºÚÆÁ¼ä¸ôÊ±¼ä
+extern int blankcount;		                    // ºÚÆÁÊ±¼ä¼ÆÊı(kernel/chr_drv/console.c)
 
-// æ‰“å°ä¿¡æ¯çš„æ—¥å¿—ç­‰çº§
+// ´òÓ¡ĞÅÏ¢µÄÈÕÖ¾µÈ¼¶
 #define LOG_INFO_TYPE       0
-// æ‰“å°debugæ—¥å¿—ä¿¡æ¯ç­‰çº§
+// ´òÓ¡debugÈÕÖ¾ĞÅÏ¢µÈ¼¶
 #define LOG_DEBUG_TYPE      1
-// æ‰“å°æŠ¥è­¦ä¿¡æ¯æ—¥å¿—ç­‰çº§
+// ´òÓ¡±¨¾¯ĞÅÏ¢ÈÕÖ¾µÈ¼¶
 #define LOG_WARN_TYPE       2
 
 extern void Log(unsigned short log_level, const char *fmt, ...);
@@ -46,7 +46,8 @@ extern void Log(unsigned short log_level, const char *fmt, ...);
  * permissions checks first, and check suser() last.
  */
 /*
- * ä¸‹é¢å‡½æ•°æ˜¯ä»¥å®çš„å½¢å¼å®šä¹‰çš„,ä½†æ˜¯åœ¨æŸæ–¹é¢æ¥çœ‹å®ƒå¯ä»¥æˆä¸ºä¸€ä¸ªçœŸæ­£çš„å­ç¨‹åº,å¦‚æœè¿”å›æ˜¯trueæ—¶å®ƒå°†è®¾ç½®æ ‡å¿—(å¦‚æœä½¿ç”¨rootç”¨æˆ·æƒé™
- * çš„è¿›ç¨‹è®¾ç½®äº†æ ‡å¿—,åˆ™ç”¨äºæ‰§è¡ŒBSDæ–¹å¼çš„è®¨è´¦å¤„ç†).è¿™æ„å‘³ç€ä½ åº”è¯¥é¦–å…ˆæ‰§è¡Œå¸¸è§„æƒé™æ£€æŸ¥,æœ€åå†æ£€æµ‹suser().
+ * ÏÂÃæº¯ÊıÊÇÒÔºêµÄĞÎÊ½¶¨ÒåµÄ,µ«ÊÇÔÚÄ³·½ÃæÀ´¿´Ëü¿ÉÒÔ³ÉÎªÒ»¸öÕæÕıµÄ×Ó³ÌĞò,Èç¹û·µ»ØÊÇtrueÊ±Ëü½«ÉèÖÃ±êÖ¾(Èç¹ûÊ¹ÓÃrootÓÃ»§È¨ÏŞ
+ * µÄ½ø³ÌÉèÖÃÁË±êÖ¾,ÔòÓÃÓÚÖ´ĞĞBSD·½Ê½µÄÌÖÕË´¦Àí).ÕâÒâÎ¶×ÅÄãÓ¦¸ÃÊ×ÏÈÖ´ĞĞ³£¹æÈ¨ÏŞ¼ì²é,×îºóÔÙ¼ì²âsuser().
  */
-#define suser() (current->euid == 0)		// æ£€æµ‹æ˜¯å¦ä¸ºè¶…çº§ç”¨æˆ·.
+#define suser() (current->euid == 0)		// ¼ì²âÊÇ·ñÎª³¬¼¶ÓÃ»§.
+

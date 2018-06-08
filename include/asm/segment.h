@@ -1,9 +1,9 @@
-// è¯¥æ–‡ä»¶å®šä¹‰äº†ä¸€äº›è®¿é—®Intel CPUä¸­æ®µå¯„å­˜å™¨æˆ–ä¸æ®µå¯„å­˜å™¨æœ‰å…³çš„å†…å­˜æ“ä½œå‡½æ•°.
+// ¸ÃÎÄ¼ş¶¨ÒåÁËÒ»Ğ©·ÃÎÊIntel CPUÖĞ¶Î¼Ä´æÆ÷»òÓë¶Î¼Ä´æÆ÷ÓĞ¹ØµÄÄÚ´æ²Ù×÷º¯Êı.
 
-//// è¯»å–fsæ®µä¸­æŒ‡å®šåœ°å€å¤„çš„å­—èŠ‚.
-// å‚æ•°:addr - æŒ‡å®šçš„å†…å­˜åœ°å€.
-// %0 - (è¿”å›çš„å­—èŠ‚_v);%1 - (å†…å­˜åœ°å€addr)
-// è¿”å›:è¿”å›å†…å­˜fs[addr]å¤„çš„å­—èŠ‚.
+//// ¶ÁÈ¡fs¶ÎÖĞÖ¸¶¨µØÖ·´¦µÄ×Ö½Ú.
+// ²ÎÊı:addr - Ö¸¶¨µÄÄÚ´æµØÖ·.
+// %0 - (·µ»ØµÄ×Ö½Ú_v);%1 - (ÄÚ´æµØÖ·addr)
+// ·µ»Ø:·µ»ØÄÚ´æfs[addr]´¦µÄ×Ö½Ú.
 static inline unsigned char get_fs_byte(const char * addr)
 {
 	unsigned register char _v;
@@ -12,10 +12,10 @@ static inline unsigned char get_fs_byte(const char * addr)
 	return _v;
 }
 
-//// è¯»å–fsæ®µä¸­æŒ‡å®šåœ°å€å¤„çš„å­—.
-// å‚æ•°:addr - æŒ‡å®šçš„å†…å­˜åœ°å€.
-// %0 - (è¿”å›çš„å­—_v);%1 - (å†…å­˜åœ°å€addr)
-// è¿”å›:è¿”å›å†…å­˜fs:[addr]å¤„çš„å­—.
+//// ¶ÁÈ¡fs¶ÎÖĞÖ¸¶¨µØÖ·´¦µÄ×Ö.
+// ²ÎÊı:addr - Ö¸¶¨µÄÄÚ´æµØÖ·.
+// %0 - (·µ»ØµÄ×Ö_v);%1 - (ÄÚ´æµØÖ·addr)
+// ·µ»Ø:·µ»ØÄÚ´æfs:[addr]´¦µÄ×Ö.
 static inline unsigned short get_fs_word(const unsigned short *addr)
 {
 	unsigned short _v;
@@ -24,10 +24,10 @@ static inline unsigned short get_fs_word(const unsigned short *addr)
 	return _v;
 }
 
-//// è¯»å–fsæ®µä¸­æŒ‡å®šåœ°å€å¤„çš„é•¿å­—(4å­—èŠ‚).
-// å‚æ•°:addr - æŒ‡å®šçš„å†…å­˜åœ°å€.
-// %0 - (è¿”å›çš„é•¿å­—_v);%1 - (å†…å­˜åœ°å€addr)
-// è¿”å›:è¿”å›å†…å­˜fs:[addr]å¤„çš„é•¿å­—.
+//// ¶ÁÈ¡fs¶ÎÖĞÖ¸¶¨µØÖ·´¦µÄ³¤×Ö(4×Ö½Ú).
+// ²ÎÊı:addr - Ö¸¶¨µÄÄÚ´æµØÖ·.
+// %0 - (·µ»ØµÄ³¤×Ö_v);%1 - (ÄÚ´æµØÖ·addr)
+// ·µ»Ø:·µ»ØÄÚ´æfs:[addr]´¦µÄ³¤×Ö.
 static inline unsigned long get_fs_long(const unsigned long *addr)
 {
 	unsigned long _v;
@@ -36,25 +36,25 @@ static inline unsigned long get_fs_long(const unsigned long *addr)
 	return _v;
 }
 
-//// å°†ä¸€å­—èŠ‚å­˜æ”¾åœ¨fsæ®µä¸­æŒ‡å®šå†…å­˜åœ°å€å¤„.
-// å‚æ•°:val - å­—èŠ‚å€¼;addr - å†…å­˜åœ°å€.
-// %0 - å¯„å­˜å™¨(å­—èŠ‚å€¼val);%1 - (å†…å­˜åœ°å€addr).
+//// ½«Ò»×Ö½Ú´æ·ÅÔÚfs¶ÎÖĞÖ¸¶¨ÄÚ´æµØÖ·´¦.
+// ²ÎÊı:val - ×Ö½ÚÖµ;addr - ÄÚ´æµØÖ·.
+// %0 - ¼Ä´æÆ÷(×Ö½ÚÖµval);%1 - (ÄÚ´æµØÖ·addr).
 static inline void put_fs_byte(char val,char *addr)
 {
 __asm__ ("movb %0,%%fs:%1"::"q" (val),"m" (*addr));
 }
 
-//// å°†ä¸€å­—å­˜æ”¾åœ¨fsæ®µä¸­æŒ‡å®šå†…å­˜åœ°å€å¤„.
-// å‚æ•°:val - å­—å€¼;addr - å†…å­˜åœ°å€.
-// %0 - å¯„å­˜å™¨(å­—å€¼val);%1 - (å†…å­˜åœ°å€addr).
+//// ½«Ò»×Ö´æ·ÅÔÚfs¶ÎÖĞÖ¸¶¨ÄÚ´æµØÖ·´¦.
+// ²ÎÊı:val - ×ÖÖµ;addr - ÄÚ´æµØÖ·.
+// %0 - ¼Ä´æÆ÷(×ÖÖµval);%1 - (ÄÚ´æµØÖ·addr).
 static inline void put_fs_word(short val,short * addr)
 {
 __asm__ ("movw %0,%%fs:%1"::"q" (val),"m" (*addr));
 }
 
-//// å°†ä¸€é•¿å­—å­˜æ”¾åœ¨fsæ®µä¸­æŒ‡å®šå†…å­˜åœ°å€å¤„.
-// å‚æ•°:val - é•¿å­—å€¼;addr - å†…å­˜åœ°å€.
-// %0 - å¯„å­˜å™¨(é•¿å­—å€¼val);%1 - (å†…å­˜åœ°å€addr).
+//// ½«Ò»³¤×Ö´æ·ÅÔÚfs¶ÎÖĞÖ¸¶¨ÄÚ´æµØÖ·´¦.
+// ²ÎÊı:val - ³¤×ÖÖµ;addr - ÄÚ´æµØÖ·.
+// %0 - ¼Ä´æÆ÷(³¤×ÖÖµval);%1 - (ÄÚ´æµØÖ·addr).
 static inline void put_fs_long(unsigned long val,unsigned long * addr)
 {
 __asm__ ("movl %0,%%fs:%1"::"q" (val),"m" (*addr));
@@ -67,8 +67,8 @@ __asm__ ("movl %0,%%fs:%1"::"q" (val),"m" (*addr));
  * [ nothing wrong here, Linus ]
  */
 
-//// å–fsæ®µå¯„å­˜å™¨å€¼(é€‰æ‹©ç¬¦).
-// è¿”å›:fsæ®µå¯„å­˜å™¨å€¼.
+//// È¡fs¶Î¼Ä´æÆ÷Öµ(Ñ¡Ôñ·û).
+// ·µ»Ø:fs¶Î¼Ä´æÆ÷Öµ.
 static inline unsigned long get_fs()
 {
 	unsigned short _v;
@@ -76,8 +76,8 @@ static inline unsigned long get_fs()
 	return _v;
 }
 
-//// å–dsé¢å¯„å­˜å™¨å€¼.
-// è¿”å›:dsæ®µå¯„å­˜å™¨å€¼.
+//// È¡dsÃæ¼Ä´æÆ÷Öµ.
+// ·µ»Ø:ds¶Î¼Ä´æÆ÷Öµ.
 static inline unsigned long get_ds()
 {
 	unsigned short _v;
@@ -85,10 +85,12 @@ static inline unsigned long get_ds()
 	return _v;
 }
 
-//// è®¾ç½®fsæ®µå¯„å­˜å™¨.
-// å‚æ•°:val - æ®µå€¼(é€‰æ‹©ç¬¦).
+//// ÉèÖÃfs¶Î¼Ä´æÆ÷.
+// ²ÎÊı:val - ¶ÎÖµ(Ñ¡Ôñ·û).
 static inline void set_fs(unsigned long val)
 {
 	__asm__("mov %0,%%fs"::"a" ((unsigned short) val));
 }
+
+
 

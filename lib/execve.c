@@ -5,11 +5,12 @@
  */
 
 #define __LIBRARY__
-#include <unistd.h>	                            // Linuxæ ‡å‡†å¤´æ–‡ä»¶.å®šä¹‰äº†å„ç§ç¬¦å·å¸¸æ•°å’Œç±»åž‹,å¹¶å£°æ˜Žäº†å„ç§å‡½æ•°.
-			                                    // å¦‚å®šä¹‰äº†__LIBRARY__,åˆ™è¿˜å«ç³»ç»Ÿè°ƒç”¨å·å’Œå†…åµŒæ±‡ç¼–_syscall0()ç­‰.
+#include <unistd.h>	                            // Linux±ê×¼Í·ÎÄ¼þ.¶¨ÒåÁË¸÷ÖÖ·ûºÅ³£ÊýºÍÀàÐÍ,²¢ÉùÃ÷ÁË¸÷ÖÖº¯Êý.
+			                                    // Èç¶¨ÒåÁË__LIBRARY__,Ôò»¹º¬ÏµÍ³µ÷ÓÃºÅºÍÄÚÇ¶»ã±à_syscall0()µÈ.
 
-// åŠ è½½å¹¶æ‰§è¡Œå­è¿›ç¨‹(å…¶ä»–ç¨‹åº)å‡½æ•°.
-// ä¸‹é¢è¯¥è°ƒç”¨å®å‡½æ•°å¯¹åº”:int execve(const char * file,char ** argv, char ** envp).
-// å‚æ•°:file - è¢«æ‰§è¡Œç¨‹åºæ–‡ä»¶å;argv - å‘½ä»¤è¡Œå‚æ•°æŒ‡é’ˆæ•°ç»„;envp - çŽ¯å¢ƒå˜é‡æŒ‡é’ˆæ•°ç»„.
-// ç›´æŽ¥è°ƒç”¨äº†ç³»ç»Ÿä¸­æ–­int 0x80,å‚æ•°æ˜¯__NR_execve.å‚è§include/unistd.hå’Œfs/exec.cç¨‹åº.
+// ¼ÓÔØ²¢Ö´ÐÐ×Ó½ø³Ì(ÆäËû³ÌÐò)º¯Êý.
+// ÏÂÃæ¸Ãµ÷ÓÃºêº¯Êý¶ÔÓ¦:int execve(const char * file,char ** argv, char ** envp).
+// ²ÎÊý:file - ±»Ö´ÐÐ³ÌÐòÎÄ¼þÃû;argv - ÃüÁîÐÐ²ÎÊýÖ¸ÕëÊý×é;envp - »·¾³±äÁ¿Ö¸ÕëÊý×é.
+// Ö±½Óµ÷ÓÃÁËÏµÍ³ÖÐ¶Ïint 0x80,²ÎÊýÊÇ__NR_execve.²Î¼ûinclude/unistd.hºÍfs/exec.c³ÌÐò.
 _syscall3(int, execve, const char *, file, char **, argv, char **, envp)
+

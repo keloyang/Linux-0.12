@@ -1,15 +1,16 @@
 #ifndef _TIMES_H
 #define _TIMES_H
 
-#include <sys/types.h>          // ç±»å‹å¤´æ–‡ä»¶ã€‚å®šä¹‰äº†åŸºæœ¬çš„ç³»ç»Ÿæ•°æ®ç±»å‹ã€‚
+#include <sys/types.h>          // ÀàĞÍÍ·ÎÄ¼ş¡£¶¨ÒåÁË»ù±¾µÄÏµÍ³Êı¾İÀàĞÍ¡£
 
 struct tms {
-	time_t tms_utime;       // ç”¨æˆ·ä½¿ç”¨çš„CPUæ—¶é—´ã€‚
-	time_t tms_stime;       // ç³»ç»Ÿï¼ˆå†…æ ¸ï¼‰CPUæ—¶é—´ã€‚
-	time_t tms_cutime;      // å·²ç»ˆæ­¢çš„å­è¿›ç¨‹ä½¿ç”¨çš„ç”¨æˆ·CPUæ—¶é—´ã€‚
-	time_t tms_cstime;      // å·²ç»ˆæ­¢çš„å­è¿›ç¨‹ä½¿ç”¨çš„ç³»ç»ŸCPUæ—¶é—´ã€‚
+	time_t tms_utime;       // ÓÃ»§Ê¹ÓÃµÄCPUÊ±¼ä¡£
+	time_t tms_stime;       // ÏµÍ³£¨ÄÚºË£©CPUÊ±¼ä¡£
+	time_t tms_cutime;      // ÒÑÖÕÖ¹µÄ×Ó½ø³ÌÊ¹ÓÃµÄÓÃ»§CPUÊ±¼ä¡£
+	time_t tms_cstime;      // ÒÑÖÕÖ¹µÄ×Ó½ø³ÌÊ¹ÓÃµÄÏµÍ³CPUÊ±¼ä¡£
 };
 
 extern time_t times(struct tms * tp);
 
 #endif
+
